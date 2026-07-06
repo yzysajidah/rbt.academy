@@ -1,0 +1,2524 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoBoiBoy RBT Academy - Kuasa Reka Bentuk</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Plus Jakarta Sans & Orbitron for futuristic look) -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js Library for 3D Rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #040510;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 85, 0, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 204, 255, 0.15) 0px, transparent 50%);
+            color: #f3f4f6;
+        }
+        .font-cyber {
+            font-family: 'Orbitron', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff5500;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff7733;
+        }
+        /* Canva selection effect in edit mode */
+        .editable-section {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .edit-mode .editable-section:hover {
+            outline: 2px solid #ff5500;
+            outline-offset: 4px;
+            box-shadow: 0 0 25px rgba(255, 85, 0, 0.2);
+        }
+        .edit-mode [contenteditable="true"]:hover {
+            background-color: rgba(255, 85, 0, 0.1);
+            outline: 1px dashed #ff5500;
+            cursor: text;
+        }
+        .edit-mode [contenteditable="true"]:focus {
+            background-color: rgba(255, 85, 0, 0.15);
+            outline: 2px solid #ff5500;
+            border-radius: 6px;
+        }
+        /* Neon glowing effects */
+        .glow-orange {
+            box-shadow: 0 0 15px rgba(255, 85, 0, 0.4);
+            border: 1px solid rgba(255, 85, 0, 0.5);
+        }
+        .glow-blue {
+            box-shadow: 0 0 15px rgba(0, 204, 255, 0.4);
+            border: 1px solid rgba(0, 204, 255, 0.5);
+        }
+        .glow-red {
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+            border: 1px solid rgba(255, 0, 85, 0.5);
+        }
+        @keyframes neonFlash {
+            0% { box-shadow: 0 0px 0px rgba(255, 85, 0, 0); border-color: rgba(255, 85, 0, 0.2); }
+            50% { box-shadow: 0 0 35px rgba(255, 85, 0, 0.85); border-color: rgba(255, 85, 0, 1); }
+            100% { box-shadow: 0 0px 0px rgba(255, 85, 0, 0); border-color: rgba(255, 85, 0, 0.2); }
+        }
+        .glow-flash {
+            animation: neonFlash 1.5s ease-in-out;
+            border-radius: 1rem;
+        }
+        /* Grid background for canvas */
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 85, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 85, 0, 0.05) 1px, transparent 1px);
+        }
+        /* Chatbot Animations */
+        @keyframes slideInUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slideup {
+            animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        /* Shake animation for incorrect answer */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+        /* Confetti or Happy Bounce */
+        @keyframes bounceGlow {
+            0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.6)); }
+            50% { transform: translateY(-15px) scale(1.05); filter: drop-shadow(0 0 25px rgba(16, 185, 129, 0.9)); }
+        }
+        .animate-bounceglow {
+            animation: bounceGlow 0.8s ease-in-out 2;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="bg-[#090d1a] text-white h-20 px-6 flex items-center justify-between border-b border-orange-500/30 shrink-0 z-50 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+        <div class="flex items-center space-x-4">
+            <div class="bg-gradient-to-r from-orange-600 to-red-600 p-2.5 rounded-xl text-white shadow-[0_0_20px_rgba(255,85,0,0.5)] animate-pulse">
+                <i class="fa-solid fa-bolt-lightning text-xl"></i>
+            </div>
+            <div>
+                <span class="text-xs text-orange-400 font-bold uppercase tracking-widest font-cyber">Sistem Kawalan Kuasa RBT</span>
+                <h1 class="text-lg md:text-xl font-black text-white tracking-wide -mt-1 font-cyber">BOBOIBOY RBT TECH ACADEMY</h1>
+            </div>
+        </div>
+
+        <!-- Mode Selector & Actions -->
+        <div class="flex items-center space-x-4">
+            <div class="bg-[#0f162e] p-1.5 rounded-full flex items-center border border-orange-500/20">
+                <button id="btn-edit-mode" onclick="setMode('edit')" class="px-5 py-2 rounded-full text-xs font-bold flex items-center space-x-2 transition-all bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg font-cyber">
+                    <i class="fa-solid fa-gears"></i>
+                    <span>Mod Penyunting</span>
+                </button>
+                <button id="btn-preview-mode" onclick="setMode('preview')" class="px-5 py-2 rounded-full text-xs font-bold flex items-center space-x-2 transition-all text-slate-400 hover:text-white font-cyber">
+                    <i class="fa-solid fa-eye"></i>
+                    <span>Pratonton Laman</span>
+                </button>
+            </div>
+
+            <button onclick="showExportModal()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 px-5 py-2.5 rounded-xl text-xs font-bold flex items-center space-x-2 transition-all text-white shadow-[0_0_15px_rgba(0,204,255,0.4)] font-cyber">
+                <i class="fa-solid fa-cloud-arrow-down"></i>
+                <span>Eksport Kod</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN INTERFACE CONTAINER -->
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <!-- LEFT SIDEBAR: Canva Element Library with instant navigation -->
+        <aside id="editor-sidebar" class="w-80 bg-[#090d1a] border-r border-orange-500/20 flex flex-col h-full transition-all duration-300 shadow-2xl shrink-0 z-40">
+            <!-- Sidebar Header -->
+            <div class="p-5 border-b border-orange-500/10 bg-[#0c1224]">
+                <h2 class="text-sm font-black text-orange-400 flex items-center space-x-2 font-cyber tracking-wider">
+                    <i class="fa-solid fa-cubes text-lg animate-spin" style="animation-duration: 8s;"></i>
+                    <span>BLOK MODUL RBT</span>
+                </h2>
+                <p class="text-[11px] text-slate-400 mt-1">Klik mana-mana kad di bawah untuk melompat terus ke tajuk tersebut atau menambahkannya jika tiada.</p>
+            </div>
+
+            <!-- Scrollable Elements Box -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                
+                <div>
+                    <h3 class="text-[10px] font-bold text-orange-500/80 uppercase tracking-widest font-cyber mb-2">Navigasi / Tambah Slaid</h3>
+                    <div class="grid grid-cols-1 gap-3">
+                        
+                        <!-- Template 1: Hero Cover -->
+                        <button onclick="handleSidebarClick('hero')" class="group text-left border border-slate-800 hover:border-orange-500 p-3 rounded-xl hover:shadow-[0_0_15px_rgba(255,85,0,0.2)] transition bg-[#0f162e] hover:bg-[#141d3a] flex items-center space-x-3 w-full">
+                            <div class="bg-orange-950 text-orange-400 p-2.5 rounded-lg transition group-hover:scale-110">
+                                <i class="fa-solid fa-house-chimney-window text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-xs font-bold text-slate-200">Cover Utama BoBoiBoy</h4>
+                                <p class="text-[10px] text-slate-500">Slaid Tajuk Bab Utama.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-orange-400 transition"></i>
+                        </button>
+
+                        <!-- Template 2: Definisi RBT -->
+                        <button onclick="handleSidebarClick('definisi')" class="group text-left border border-slate-800 hover:border-orange-500 p-3 rounded-xl hover:shadow-[0_0_15px_rgba(255,85,0,0.2)] transition bg-[#0f162e] hover:bg-[#141d3a] flex items-center space-x-3 w-full">
+                            <div class="bg-blue-950 text-blue-400 p-2.5 rounded-lg transition group-hover:scale-110">
+                                <i class="fa-solid fa-graduation-cap text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-xs font-bold text-slate-200">Definisi & Bidang</h4>
+                                <p class="text-[10px] text-slate-500">Konkrit vs Abstrak (Jadual).</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-blue-400 transition"></i>
+                        </button>
+
+                        <!-- Template 3: Elemen RB Part 1 -->
+                        <button onclick="handleSidebarClick('elemen1')" class="group text-left border border-slate-800 hover:border-orange-500 p-3 rounded-xl hover:shadow-[0_0_15px_rgba(255,85,0,0.2)] transition bg-[#0f162e] hover:bg-[#141d3a] flex items-center space-x-3 w-full">
+                            <div class="bg-red-950 text-red-400 p-2.5 rounded-lg transition group-hover:scale-110">
+                                <i class="fa-solid fa-shapes text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-xs font-bold text-slate-200">Elemen Part 1</h4>
+                                <p class="text-[10px] text-slate-500">Garisan, Rupa & Bentuk.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-red-400 transition"></i>
+                        </button>
+
+                        <!-- Template 4: Elemen RB Part 2 -->
+                        <button onclick="handleSidebarClick('elemen2')" class="group text-left border border-slate-800 hover:border-orange-500 p-3 rounded-xl hover:shadow-[0_0_15px_rgba(255,85,0,0.2)] transition bg-[#0f162e] hover:bg-[#141d3a] flex items-center space-x-3 w-full">
+                            <div class="bg-cyan-950 text-cyan-400 p-2.5 rounded-lg transition group-hover:scale-110">
+                                <i class="fa-solid fa-palette text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-xs font-bold text-slate-200">Elemen Part 2</h4>
+                                <p class="text-[10px] text-slate-500">Tekstur, Saiz, Warna & Ruang.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-cyan-400 transition"></i>
+                        </button>
+
+                        <!-- Template 5: Prinsip RB Part 1 -->
+                        <button onclick="handleSidebarClick('prinsip1')" class="group text-left border border-slate-800 hover:border-orange-500 p-3 rounded-xl hover:shadow-[0_0_15px_rgba(255,85,0,0.2)] transition bg-[#0f162e] hover:bg-[#141d3a] flex items-center space-x-3 w-full">
+                            <div class="bg-yellow-950 text-yellow-400 p-2.5 rounded-lg transition group-hover:scale-110">
+                                <i class="fa-solid fa-scale-balanced text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-xs font-bold text-slate-200">Prinsip Part 1</h4>
+                                <p class="text-[10px] text-slate-500">Keseimbangan, Ulangan, Kontras.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-yellow-400 transition"></i>
+                        </button>
+
+                        <!-- Template 6: Prinsip RB Part 2 -->
+                        <button onclick="handleSidebarClick('prinsip2')" class="group text-left border border-slate-800 hover:border-orange-500 p-3 rounded-xl hover:shadow-[0_0_15px_rgba(255,85,0,0.2)] transition bg-[#0f162e] hover:bg-[#141d3a] flex items-center space-x-3 w-full">
+                            <div class="bg-emerald-950 text-emerald-400 p-2.5 rounded-lg transition group-hover:scale-110">
+                                <i class="fa-solid fa-object-group text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-xs font-bold text-slate-200">Prinsip Part 2</h4>
+                                <p class="text-[10px] text-slate-500">Kepelbagaian, Kesatuan, Ringkas, Harmoni.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-emerald-400 transition"></i>
+                        </button>
+
+                        <!-- Template 7: Kuiz BoBoiBoy 15 Soalan -->
+                        <button onclick="handleSidebarClick('kuiz')" class="group text-left border border-slate-800 hover:border-orange-500 p-3 rounded-xl hover:shadow-[0_0_15px_rgba(255,85,0,0.2)] transition bg-[#0f162e] hover:bg-[#141d3a] flex items-center space-x-3 w-full">
+                            <div class="bg-purple-950 text-purple-400 p-2.5 rounded-lg transition group-hover:scale-110">
+                                <i class="fa-solid fa-trophy text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-xs font-bold text-slate-200">Kuiz Ochobot 15 Soalan</h4>
+                                <p class="text-[10px] text-slate-500">Cabaran gempak & papan markah.</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-purple-400 transition"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Color Palette Switcher -->
+                <div class="border-t border-orange-500/10 pt-4">
+                    <h3 class="text-[10px] font-bold text-orange-500/80 uppercase tracking-widest font-cyber mb-2">Skema Elemen BoBoiBoy</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="changeTheme('halilintar')" class="border border-slate-800 hover:border-red-500 p-2 rounded-lg text-[11px] font-bold flex items-center space-x-1.5 bg-[#0f162e] text-slate-200">
+                            <span class="w-3 h-3 rounded-full bg-red-600 inline-block shadow-[0_0_8px_rgba(255,0,0,0.8)]"></span>
+                            <span>Halilintar</span>
+                        </button>
+                        <button onclick="changeTheme('taufan')" class="border border-slate-800 hover:border-cyan-500 p-2 rounded-lg text-[11px] font-bold flex items-center space-x-1.5 bg-[#0f162e] text-slate-200">
+                            <span class="w-3 h-3 rounded-full bg-cyan-400 inline-block shadow-[0_0_8px_rgba(0,204,255,0.8)]"></span>
+                            <span>Taufan</span>
+                        </button>
+                        <button onclick="changeTheme('gempa')" class="border border-slate-800 hover:border-orange-500 p-2 rounded-lg text-[11px] font-bold flex items-center space-x-1.5 bg-[#0f162e] text-slate-200">
+                            <span class="w-3 h-3 rounded-full bg-orange-500 inline-block shadow-[0_0_8px_rgba(255,85,0,0.8)]"></span>
+                            <span>Gempa</span>
+                        </button>
+                        <button onclick="changeTheme('solar')" class="border border-slate-800 hover:border-yellow-400 p-2 rounded-lg text-[11px] font-bold flex items-center space-x-1.5 bg-[#0f162e] text-slate-200">
+                            <span class="w-3 h-3 rounded-full bg-yellow-400 inline-block shadow-[0_0_8px_rgba(250,204,21,0.8)]"></span>
+                            <span>Solar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-orange-500/5 p-3.5 rounded-xl border border-orange-500/20 text-xs">
+                    <h4 class="font-bold text-orange-400 flex items-center space-x-1.5 font-cyber">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>PROGRAMMER LAB TIPS</span>
+                    </h4>
+                    <p class="text-[10px] text-slate-400 mt-1.5 leading-relaxed">
+                        Gunakan butang navigasi kiri untuk lompat terus ke mana-mana slaid. Tanyakan Ochobot AI di bahagian bawah kanan skrin jika anda mempunyai soalan subjek RBT!
+                    </p>
+                </div>
+
+            </div>
+            
+            <div class="p-3 border-t border-orange-500/10 bg-[#0c1224] text-center text-[10px] text-slate-500 font-cyber">
+                RBT TECH-LAB V3.5 • BY GEMINI
+            </div>
+        </aside>
+
+        <!-- CENTER CANVAS -->
+        <main class="flex-1 overflow-y-auto p-6 md:p-10 relative edit-mode grid-bg" id="canvas-container">
+            
+            <!-- Welcome banner in dashboard style -->
+            <div id="welcome-banner" class="max-w-4xl mx-auto mb-8 bg-[#0c1224]/80 border border-orange-500/30 rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.6)] flex items-center justify-between relative overflow-hidden backdrop-blur-md">
+                <div class="absolute -right-10 -top-10 opacity-10 transform rotate-12">
+                    <i class="fa-solid fa-dharmachakra text-[180px] text-orange-500 animate-spin" style="animation-duration: 20s;"></i>
+                </div>
+                <div class="z-10 relative space-y-2">
+                    <span class="bg-gradient-to-r from-orange-500 to-red-600 text-white font-extrabold text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-cyber shadow-[0_0_10px_rgba(255,85,0,0.4)]">
+                        KSSM RBT TINGKATAN 1
+                    </span>
+                    <h2 class="text-2xl font-black text-white font-cyber tracking-wide">PENGATURCARAAN PEMBELAJARAN INTERAKTIF</h2>
+                    <p class="text-xs text-slate-300 max-w-xl">
+                        Selamat datang ke stesen reka bentuk kuasa BoBoiBoy. Tekan mana-mana menu di panel kiri untuk lompat ke modul, atau jawab kuiz 15 soalan beranimasi kami!
+                    </p>
+                </div>
+                <button onclick="document.getElementById('welcome-banner').remove()" class="bg-slate-800 hover:bg-orange-600 p-2 rounded-xl text-white transition z-10 self-start">
+                    <i class="fa-solid fa-xmark text-sm w-4 h-4 flex items-center justify-center"></i>
+                </button>
+            </div>
+
+            <!-- 3D INTERACTIVE ENGINE SECTION WITH ELEMEN & PRINSIP SELECTOR -->
+            <div class="max-w-4xl mx-auto mb-10 bg-[#0c1224] rounded-2xl border border-cyan-500/30 p-6 shadow-2xl relative">
+                <div class="absolute top-4 right-4 flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span class="text-[10px] text-emerald-400 font-cyber font-bold uppercase tracking-wider">3D ENGINE ONLINE</span>
+                </div>
+                <h3 class="text-md font-bold text-cyan-400 font-cyber uppercase tracking-wider mb-2 flex items-center space-x-2">
+                    <i class="fa-solid fa-dharmachakra text-lg animate-spin" style="animation-duration: 4s;"></i>
+                    <span>Teras Kuasa Ochobot - Teroka Hologram RBT 3D</span>
+                </h3>
+                <p class="text-xs text-slate-400 mb-4">
+                    Pilih mana-mana Elemen atau Prinsip di bawah untuk menghasilkan visualisasi 3D holografik yang mewakili konsep tersebut dalam masa nyata!
+                </p>
+
+                <!-- Hologram Controls Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <!-- 7 Elemen Tab Selector -->
+                    <div class="bg-[#090d1a] border border-slate-800 rounded-xl p-3">
+                        <span class="text-[10px] font-bold text-orange-500 uppercase tracking-widest font-cyber block mb-2"><i class="fa-solid fa-shapes mr-1"></i> 7 ELEMEN REKA BENTUK</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button id="btn-3d-garisan" onclick="select3DConcept('elemen', 'garisan')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-orange-950/40 border border-slate-800 hover:border-orange-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Garisan</button>
+                            <button id="btn-3d-rupa" onclick="select3DConcept('elemen', 'rupa')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-orange-950/40 border border-slate-800 hover:border-orange-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Rupa</button>
+                            <button id="btn-3d-bentuk" onclick="select3DConcept('elemen', 'bentuk')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-orange-950/40 border border-slate-800 hover:border-orange-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Bentuk</button>
+                            <button id="btn-3d-tekstur" onclick="select3DConcept('elemen', 'tekstur')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-orange-950/40 border border-slate-800 hover:border-orange-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Tekstur</button>
+                            <button id="btn-3d-saiz" onclick="select3DConcept('elemen', 'saiz')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-orange-950/40 border border-slate-800 hover:border-orange-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Saiz</button>
+                            <button id="btn-3d-warna" onclick="select3DConcept('elemen', 'warna')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-orange-950/40 border border-slate-800 hover:border-orange-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Warna</button>
+                            <button id="btn-3d-ruang" onclick="select3DConcept('elemen', 'ruang')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-orange-950/40 border border-slate-800 hover:border-orange-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Ruang</button>
+                        </div>
+                    </div>
+
+                    <!-- 7 Prinsip Tab Selector -->
+                    <div class="bg-[#090d1a] border border-slate-800 rounded-xl p-3">
+                        <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest font-cyber block mb-2"><i class="fa-solid fa-scale-balanced mr-1"></i> 7 PRINSIP REKA BENTUK</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button id="btn-3d-keseimbangan" onclick="select3DConcept('prinsip', 'keseimbangan')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Keseimbangan</button>
+                            <button id="btn-3d-pengulangan" onclick="select3DConcept('prinsip', 'pengulangan')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Pengulangan</button>
+                            <button id="btn-3d-kontras" onclick="select3DConcept('prinsip', 'kontras')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Kontras</button>
+                            <button id="btn-3d-kepelbagaian" onclick="select3DConcept('prinsip', 'kepelbagaian')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Kepelbagaian</button>
+                            <button id="btn-3d-kesatuan" onclick="select3DConcept('prinsip', 'kesatuan')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Kesatuan</button>
+                            <button id="btn-3d-keringkasan" onclick="select3DConcept('prinsip', 'keringkasan')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Keringkasan</button>
+                            <button id="btn-3d-harmoni" onclick="select3DConcept('prinsip', 'harmoni')" class="px-2.5 py-1.5 bg-slate-900 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/50 rounded-lg text-[11px] font-semibold text-slate-300 transition-all">Harmoni</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- NEW SPLIT SCREEN: DESCRIPTION SIDE-BY-SIDE WITH 3D CANVAS (PREVENTS OVERLAPPING) -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left Side Panel: Dynamic RBT Hologram HUD Panel -->
+                    <div id="hologram-hud-panel" class="bg-[#090d1a] border border-orange-500/20 p-5 rounded-xl flex flex-col justify-between backdrop-blur-sm shadow-[0_0_15px_rgba(255,85,0,0.1)] transition-all duration-300 min-h-[16rem] lg:min-h-0">
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-2.5">
+                                <div class="bg-orange-500/10 text-orange-400 p-2.5 rounded-lg text-xs font-cyber flex items-center justify-center">
+                                    <i class="fa-solid fa-cube animate-pulse text-sm"></i>
+                                </div>
+                                <div>
+                                    <span id="hologram-cat" class="text-[9px] font-bold text-orange-400 tracking-widest uppercase block font-cyber">TERAS UTAMA OCHOBOT</span>
+                                    <h4 id="hologram-title" class="text-sm font-black text-white font-cyber mt-0.5">SFERA KUASA ASAL</h4>
+                                </div>
+                            </div>
+                            <!-- Horizontal separator -->
+                            <div class="h-px bg-slate-800/80 w-full"></div>
+                            
+                            <p id="hologram-desc" class="text-xs text-slate-400 leading-relaxed font-medium">Kuasa elemen reka bentuk berpusat di sini. Putar sfera 360° menggunakan tetikus atau sentuhan.</p>
+                        </div>
+                        
+                        <!-- Extra Interactive Tip Inside Panel -->
+                        <div class="mt-4 pt-4 border-t border-slate-800/80 text-[10px] text-slate-500 flex items-start gap-2">
+                            <i class="fa-solid fa-compass-drafting text-orange-500 mt-0.5 text-xs"></i>
+                            <span>Klik mana-mana butang elemen atau prinsip di atas untuk menukar simulasi holografik ini.</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Clean 3D Canvas Box (Entirely unblocked) -->
+                    <div class="lg:col-span-2 relative">
+                        <div id="canvas3d-container" class="w-full h-96 rounded-xl bg-gradient-to-b from-[#04060d] to-[#0d1224] border border-slate-800 relative overflow-hidden cursor-grab active:cursor-grabbing shadow-inner flex items-center justify-center">
+                            <!-- Helper guide overlay inside the 3D frame -->
+                            <div class="absolute bottom-3 text-center w-full text-[10px] text-slate-500 font-cyber pointer-events-none tracking-widest uppercase">
+                                <i class="fa-solid fa-hand-pointer animate-pulse mr-1"></i> Klik & Seret untuk memutar Teras Reka Bentuk 360°
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THE WEB CONTENT WRAPPER -->
+            <div id="web-layout-wrapper" class="max-w-4xl mx-auto space-y-8 pb-32">
+                <!-- Dynamic slide sections will be added here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- CHATBOT WIDGET OVERLAY (Ochobot AI Assistant) -->
+    <div id="chatbot-container" class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <!-- Floating Activator Button -->
+        <button id="chatbot-toggle" onclick="toggleChatbot()" class="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 w-14 h-14 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(255,85,0,0.6)] hover:scale-105 transition-all relative">
+            <i class="fa-solid fa-robot text-xl"></i>
+            <span class="absolute -top-1 -right-1 bg-cyan-400 text-slate-950 font-bold text-[9px] px-1.5 py-0.5 rounded-full uppercase animate-bounce font-cyber">AI</span>
+        </button>
+
+        <!-- Chat Panel Window -->
+        <div id="chatbot-panel" class="hidden w-96 h-[500px] bg-[#090d1a] border border-orange-500/30 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden mb-3 animate-slideup">
+            <!-- Chat Panel Header -->
+            <div class="p-4 bg-gradient-to-r from-[#0c1224] to-[#0f162e] border-b border-orange-500/20 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 border border-orange-500/30">
+                        <i class="fa-solid fa-circle-nodes animate-pulse"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-black text-white font-cyber">Ochobot RBT AI</h4>
+                        <span id="chatbot-status-label" class="text-[9px] text-emerald-400 font-bold uppercase font-cyber flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Mengesan sambungan...
+                        </span>
+                    </div>
+                </div>
+                <button onclick="toggleChatbot()" class="text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-minus text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Messages Window -->
+            <div id="chatbot-messages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
+                <!-- Welcome Message -->
+                <div class="flex items-start space-x-2">
+                    <div class="bg-orange-950 p-1.5 rounded-lg text-orange-400 text-[10px] font-cyber mt-1">AI</div>
+                    <div class="bg-slate-900/80 border border-slate-800 p-3 rounded-xl text-slate-300 max-w-[80%] leading-relaxed">
+                        Hai awak! Saya **Ochobot AI**. Saya tahu segalanya tentang subjek **Reka Bentuk dan Teknologi Tingkatan 1 (Bab 1)**! Tanya saya apa-apa sahaja soalan berkaitan elemen, prinsip, definisi atau bidang konkrit dan abstrak. Mari belajar bersama! ⚡️
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suggested Prompts -->
+            <div class="px-3 py-1 border-t border-slate-800 bg-[#070a14] flex gap-2 overflow-x-auto whitespace-nowrap text-[10px]">
+                <button onclick="sendSuggestedMessage('Apakah maksud Reka Bentuk?')" class="bg-slate-900 hover:bg-orange-950 border border-slate-800 hover:border-orange-500/40 px-2.5 py-1 rounded-full text-slate-300 transition shrink-0">Definisi RBT</button>
+                <button onclick="sendSuggestedMessage('Sebutkan 7 elemen reka bentuk')" class="bg-slate-900 hover:bg-orange-950 border border-slate-800 hover:border-orange-500/40 px-2.5 py-1 rounded-full text-slate-300 transition shrink-0">7 Elemen</button>
+                <button onclick="sendSuggestedMessage('Apa beza reka bentuk konkrit dan abstrak?')" class="bg-slate-900 hover:bg-orange-950 border border-slate-800 hover:border-orange-500/40 px-2.5 py-1 rounded-full text-slate-300 transition shrink-0">Konkrit vs Abstrak</button>
+                <button onclick="sendSuggestedMessage('Terangkan prinsip keringkasan')" class="bg-slate-900 hover:bg-orange-950 border border-slate-800 hover:border-orange-500/40 px-2.5 py-1 rounded-full text-slate-300 transition shrink-0">Keringkasan</button>
+            </div>
+
+            <!-- Input Box -->
+            <div class="p-3 border-t border-orange-500/20 bg-[#0c1224] flex items-center space-x-2">
+                <input id="chatbot-input" onkeydown="handleChatInput(event)" type="text" placeholder="Tanyakan Ochobot di sini..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500">
+                <button onclick="sendChatMessage()" class="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 p-2.5 rounded-xl text-white transition flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXPORT MODAL -->
+    <div id="export-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hidden backdrop-blur-md">
+        <div class="bg-[#090d1a] border border-orange-500/30 rounded-2xl w-full max-w-2xl p-6 shadow-[0_0_50px_rgba(255,85,0,0.3)] transform transition-all scale-95 duration-200">
+            <div class="flex items-center justify-between border-b border-orange-500/20 pb-4">
+                <h3 class="text-lg font-bold text-orange-400 flex items-center space-x-2 font-cyber">
+                    <i class="fa-solid fa-share-nodes"></i>
+                    <span>KOD SUMBER LAMAN WEB RBT</span>
+                </h3>
+                <button onclick="closeExportModal()" class="text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="py-6 space-y-4">
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Salin kod HTML pengaturcaraan di bawah. Nota ini telah dioptimumkan sepenuhnya bersama kandungan penuh buku teks RBT Tingkatan 1, siap sedia untuk dihoskan terus atau digabungkan ke platform kegemaran anda!
+                </p>
+                
+                <div class="bg-[#0f162e] border border-orange-500/20 p-3.5 rounded-xl flex items-start space-x-3">
+                    <i class="fa-solid fa-circle-exclamation text-orange-400 mt-0.5"></i>
+                    <p class="text-[11px] text-orange-200">
+                        Nota ini mengekalkan segala perubahan teks langsung dan susunan slaid unik yang anda reka sebentar tadi.
+                    </p>
+                </div>
+
+                <div class="relative">
+                    <label class="text-xs font-bold text-slate-400 block mb-1.5 font-cyber">KOD PENUH PRODUCTION-READY (HTML & CSS)</label>
+                    <textarea id="export-code-box" readonly class="w-full h-48 bg-slate-950 border border-slate-800 rounded-lg p-3 text-[10px] font-mono text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-800">
+                <button onclick="closeExportModal()" class="px-5 py-2.5 border border-slate-800 text-slate-400 rounded-xl text-xs font-bold hover:bg-[#0c1224] transition">Batal</button>
+                <button onclick="copyGeneratedCode()" class="px-6 py-2.5 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl text-xs font-bold shadow-md hover:from-orange-700 hover:to-red-700 transition flex items-center space-x-2 font-cyber">
+                    <i class="fa-solid fa-copy"></i>
+                    <span>Salin Semua Kod</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
+
+    <script>
+        // System Config & Themes
+        let activeTheme = 'gempa';
+        let currentMode = 'edit';
+
+        const themes = {
+            halilintar: {
+                primary: 'red-500',
+                secondary: 'red-600',
+                accent: 'bg-red-950/40 text-red-400 border-red-500/30',
+                bgGradient: 'from-slate-950 to-red-950/20',
+                colorHex: '#ff003c'
+            },
+            taufan: {
+                primary: 'cyan-400',
+                secondary: 'cyan-600',
+                accent: 'bg-cyan-950/40 text-cyan-400 border-cyan-500/30',
+                bgGradient: 'from-slate-950 to-cyan-950/20',
+                colorHex: '#00ccff'
+            },
+            gempa: {
+                primary: 'orange-500',
+                secondary: 'orange-600',
+                accent: 'bg-orange-950/40 text-orange-400 border-orange-500/30',
+                bgGradient: 'from-slate-950 to-orange-950/20',
+                colorHex: '#ff5500'
+            },
+            solar: {
+                primary: 'yellow-400',
+                secondary: 'yellow-500',
+                accent: 'bg-yellow-950/40 text-yellow-400 border-yellow-500/30',
+                bgGradient: 'from-slate-950 to-yellow-950/20',
+                colorHex: '#fac415'
+            }
+        };
+
+        // Complete 15 Questions Database for RBT Tingkatan 1, Bab 1
+        const quizDatabase = [
+            {
+                q: "Reka bentuk dan teknologi ditakrifkan sebagai gabungan pengetahuan tentang penyusunan bahan secara terancang dengan mengaplikasikan pengetahuan apa?",
+                options: [
+                    "Sains dan Sejarah",
+                    "Matematik dan Lukisan Teknikal",
+                    "Sains dan Matematik",
+                    "Geografi dan Kejuruteraan"
+                ],
+                correct: 2
+            },
+            {
+                q: "Antara berikut, produk manakah yang tergolong dalam kategori Reka Bentuk Konkrit (Maujud)?",
+                options: [
+                    "Sistem pengairan dan atur cara komputer",
+                    "Peralatan, mesin, pakaian, dan makanan",
+                    "Bahasa isyarat and pengiklanan",
+                    "Perkhidmatan sewaan dan pengangkutan"
+                ],
+                correct: 1
+            },
+            {
+                q: "Manakah antara berikut merupakan jenis Reka Bentuk Abstrak di bawah kumpulan Seni/Komunikasi?",
+                options: [
+                    "Atur cara, grafik, bahasa, dan pengiklanan",
+                    "Pertanian fertigasi dan akuaponik",
+                    "Seramik, arca, dan alat muzik",
+                    "Pakaian dan reka bentuk hiasan dalaman"
+                ],
+                correct: 0
+            },
+            {
+                q: "Buku teks RBT menyatakan garisan ialah cantuman siri titik yang mempunyai ukuran panjang dan jarak. Manakah fungsi garisan yang diwakili oleh 'tali gitar'?",
+                options: [
+                    "Membahagikan dua ruang kawasan",
+                    "Menunjukkan pergerakan arah",
+                    "Menunjukkan keseimbangan objek",
+                    "Mewakili ketegangan antara dua titik"
+                ],
+                correct: 3
+            },
+            {
+                q: "Apakah maksud Rupa Geometri (2D) di bawah elemen reka bentuk?",
+                options: [
+                    "Rupa permukaan bebas dan tidak terikat pada bentuk khusus",
+                    "Rupa bersudut, berpenjuru dan mempunyai formula matematik",
+                    "Objek yang mempunyai isi padu dan berjisim",
+                    "Gambar lukisan yang nampak seperti objek 3D nyata"
+                ],
+                correct: 1
+            },
+            {
+                q: "Apakah perbezaan ketara antara rupa dan bentuk di bawah elemen reka bentuk?",
+                options: [
+                    "Rupa bersifat 2D (tidak berjisim), manakah bentuk bersifat 3D (mempunyai ruang & isi padu)",
+                    "Rupa sentiasa organik manakala bentuk sentiasa konkrit",
+                    "Rupa mempunyai bayang-bayang tetapi bentuk tiada",
+                    "Rupa sentiasa bersudut manakala bentuk sentiasa bulat"
+                ],
+                correct: 0
+            },
+            {
+                q: "Warna terbahagi kepada warna primer, sekunder, dan tertier. Antara berikut, manakah kumpulan Warna Panas yang melambangkan keceriaan dan semangat?",
+                options: [
+                    "Biru, hijau, dan ungu",
+                    "Putih, kelabu, dan hitam",
+                    "Merah, jingga, dan kuning",
+                    "Merah jambu, coklat, dan turkois"
+                ],
+                correct: 2
+            },
+            {
+                q: "Apakah definisi bagi Elemen Ruang?",
+                options: [
+                    "Cantuman siri titik yang berterusan",
+                    "Kawasan kosong yang dikelilingi oleh elemen garisan",
+                    "Kesan jalinan kasar atau licin sesuatu produk",
+                    "Sistem ukuran fizikal bagi membandingkan produk"
+                ],
+                correct: 1
+            },
+            {
+                q: "Di bawah elemen tekstur atau jalinan, apakah deria yang membolehkan kita merasai tekstur kasar atau licin?",
+                options: [
+                    "Deria pendengaran sahaja",
+                    "Deria sentuhan atau penglihatan",
+                    "Deria rasa kimia",
+                    "Deria keseimbangan graviti"
+                ],
+                correct: 1
+            },
+            {
+                q: "Prinsip Keseimbangan terbahagi kepada dua kategori iaitu:",
+                options: [
+                    "Keseimbangan Simetri (Formal) dan Keseimbangan Asimetri (Tidak Formal)",
+                    "Keseimbangan Warna Panas and Warna Sejuk",
+                    "Keseimbangan Ruang Nyata dan Ruang Ilusi",
+                    "Keseimbangan Konkrit dan Keseimbangan Abstrak"
+                ],
+                correct: 0
+            },
+            {
+                q: "Sofa berwarna kuning terang diletakkan di dalam bilik yang mempunyai persekitaran hitam/gelap. Apakah nama prinsip ini?",
+                options: [
+                    "Prinsip Kesatuan",
+                    "Prinsip Kontras",
+                    "Prinsip Pengulangan",
+                    "Prinsip Keringkasan"
+                ],
+                correct: 1
+            },
+            {
+                q: "Penyusunan semula objek secara berulang-ulang dari segi saiz dan bentuk dalam reka bentuk produk adalah prinsip apa?",
+                options: [
+                    "Harmoni",
+                    "Pengulangan",
+                    "Kepelbagaian",
+                    "Kesatuan"
+                ],
+                correct: 1
+            },
+            {
+                q: "Apakah prinsip Reka Bentuk yang bermaksud menyusun elemen-elemen reka bentuk yang memberikan kepuasan, keamanan dan ketenangan visual?",
+                options: [
+                    "Kesatuan",
+                    "Kepelbagaian",
+                    "Keringkasan",
+                    "Harmoni"
+                ],
+                correct: 3
+            },
+            {
+                q: "Idea yang kompleks perlu diolah semula dalam bentuk visual yang mudah dibaca dan ringkas. Apakah prinsip reka bentuk ini?",
+                options: [
+                    "Kesatuan",
+                    "Keringkasan",
+                    "Kontras",
+                    "Keseimbangan"
+                ],
+                correct: 1
+            },
+            {
+                q: "Apakah peranan utama prinsip Kesatuan (Unity) dalam reka bentuk?",
+                options: [
+                    "Menunjukkan perbezaan yang amat ketara pada ciri elemen",
+                    "Mengurangkan bilangan elemen sehingga menjadi satu sahaja",
+                    "Menggabungkan semua bahagian elemen untuk membentuk imej, tema atau idea yang sempurna",
+                    "Membentuk corak yang berulang secara bersimetri"
+                ],
+                correct: 2
+            }
+        ];
+
+        let userQuizScore = 0;
+        let currentQuizIndex = 0;
+
+        // Complete Slide Templates Database with comprehensive textbooks info
+        const slideTemplates = {
+            hero: () => `
+                <div class="relative overflow-hidden bg-gradient-to-br ${themes[activeTheme].bgGradient} text-white rounded-2xl p-8 md:p-12 shadow-2xl border border-${themes[activeTheme].primary}/30">
+                    <div class="absolute inset-0 bg-grid-white/5 opacity-20"></div>
+                    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div class="md:w-3/5 space-y-5">
+                            <span class="inline-flex items-center rounded-full bg-slate-900/80 px-3 py-1 text-[10px] font-bold text-${themes[activeTheme].primary} border border-${themes[activeTheme].primary}/30 uppercase tracking-widest font-cyber shadow-md">
+                                MODUL 1: PENGENALAN KEPADA REKA BENTUK
+                            </span>
+                            <h1 contenteditable="true" class="text-3xl md:text-5xl font-black tracking-tight leading-none font-cyber">
+                                Dunia Reka Bentuk & Teknologi
+                            </h1>
+                            <p contenteditable="true" class="text-xs text-slate-300 leading-relaxed font-light">
+                                Kuasa Reka Bentuk bermula di sini! Terokai gabungan sains, matematik, dan teknologi untuk mencipta inovasi yang menakjubkan bagi memudahkan urusan harian manusia.
+                            </p>
+                        </div>
+                        <div class="md:w-2/5 flex justify-center">
+                            <div class="w-48 h-48 bg-slate-900/90 rounded-2xl border border-${themes[activeTheme].primary}/40 p-4 flex flex-col items-center justify-center text-center shadow-inner relative transform hover:rotate-3 transition duration-300">
+                                <i class="fa-solid fa-robot text-5xl text-${themes[activeTheme].primary} mb-3 animate-bounce"></i>
+                                <div class="font-black text-sm text-white font-cyber">TECH CORPS</div>
+                                <div class="text-[9px] text-slate-400 mt-1 uppercase font-cyber">Sedia Bertindak</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            definisi: () => `
+                <div class="bg-[#0c1224]/80 rounded-2xl p-8 shadow-xl border border-slate-800">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+                        <div>
+                            <span class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber">BAB 1.1: DUNIA REKA BENTUK</span>
+                            <h2 contenteditable="true" class="text-xl font-bold font-cyber text-white tracking-wide">Maksud & Bidang Reka Bentuk</h2>
+                        </div>
+                        <i class="fa-solid fa-circle-question text-xl text-slate-600"></i>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="p-5 rounded-xl bg-slate-950/50 border border-slate-800">
+                            <h3 class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber mb-2">Maksud Reka Bentuk & Teknologi</h3>
+                            <p contenteditable="true" class="text-xs text-slate-300 leading-relaxed">
+                                Gabungan pengetahuan tentang penyusunan bahan secara terancang dengan mengaplikasikan pengetahuan sains dan matematik bagi memudahkan kehidupan manusia.
+                            </p>
+                        </div>
+                        <div class="p-5 rounded-xl bg-slate-950/50 border border-slate-800">
+                            <h3 class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber mb-2">Pecahan Bidang Reka Bentuk</h3>
+                            <p contenteditable="true" class="text-xs text-slate-300 leading-relaxed">
+                                Reka bentuk terbahagi kepada dua kategori utama iaitu **Reka Bentuk Konkrit** (maujud: boleh dilihat dan dipegang) dan **Reka Bentuk Abstrak** (mujarad: dilihat tetapi tidak boleh dipegang).
+                            </p>
+                        </div>
+                    </div>
+
+                    <h4 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider font-cyber">Jadual Bidang Reka Bentuk & Teknologi</h4>
+                    <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/40">
+                        <table class="w-full text-xs text-left text-slate-300">
+                            <thead class="bg-slate-900/60 text-[10px] uppercase font-cyber text-${themes[activeTheme].primary}">
+                                <tr>
+                                    <th class="px-4 py-3 border-r border-slate-800">Kumpulan</th>
+                                    <th class="px-4 py-3 border-r border-slate-800">Konkrit (Maujud)</th>
+                                    <th class="px-4 py-3">Abstrak (Mujarad)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800">
+                                <tr>
+                                    <td class="px-4 py-3 font-bold border-r border-slate-800">Teknologi / Perkhidmatan</td>
+                                    <td class="px-4 py-3 border-r border-slate-800">Peralatan, Mesin, Pertanian, Pemakanan, Pakaian, Persenjataan</td>
+                                    <td class="px-4 py-3">Pengangkutan, Sewaan, Sistem Pembelajaran, Pengairan</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-bold border-r border-slate-800">Seni / Komunikasi</td>
+                                    <td class="px-4 py-3 border-r border-slate-800">Seramik, Masakan, Lukisan, Alat Muzik, Arca, Halus, Sulaman</td>
+                                    <td class="px-4 py-3">Bahasa, Atur Cara, Bunyi/Isyarat, Persuratan, Pengiklanan, Grafik</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `,
+            elemen1: () => `
+                <div class="bg-[#0c1224]/80 rounded-2xl p-8 shadow-xl border border-slate-800">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+                        <div>
+                            <span class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber">BAB 1.1.2: ELEMEN REKA BENTUK</span>
+                            <h2 contenteditable="true" class="text-xl font-bold font-cyber text-white tracking-wide">Tiga Elemen Teratas (Garisan, Rupa, Bentuk)</h2>
+                        </div>
+                        <i class="fa-solid fa-shapes text-xl text-slate-600"></i>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- 1. Garisan -->
+                        <div class="p-5 rounded-xl bg-slate-950/60 border border-slate-800">
+                            <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                                <span class="bg-${themes[activeTheme].primary} text-slate-950 w-5 h-5 rounded-full flex items-center justify-center text-xs font-cyber font-bold">1</span>
+                                <span>GARISAN</span>
+                            </h3>
+                            <p contenteditable="true" class="text-xs text-slate-400 mt-1 mb-3">
+                                Cantuman atau sambungan siri titik yang mempunyai ukuran panjang dan jarak.
+                            </p>
+                            <h4 class="text-[10px] text-${themes[activeTheme].primary} font-cyber uppercase tracking-wider mb-2">9 Fungsi Utama Garisan:</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px] text-slate-300">
+                                <div class="bg-slate-900 p-2 rounded-lg hover:border-orange-500/40 border border-transparent transition cursor-pointer" onclick="select3DConcept('elemen', 'garisan')">(a) Membahagikan dua ruang kawasan.</div>
+                                <div class="bg-slate-900 p-2 rounded-lg hover:border-orange-500/40 border border-transparent transition cursor-pointer" onclick="select3DConcept('elemen', 'garisan')">(b) Menunjukkan pergerakan arah/aliran.</div>
+                                <div class="bg-slate-900 p-2 rounded-lg hover:border-orange-500/40 border border-transparent transition cursor-pointer" onclick="select3DConcept('elemen', 'garisan')">(c) Menunjukkan perhubungan antara elemen.</div>
+                                <div class="bg-slate-900 p-2 rounded-lg hover:border-orange-500/40 border border-transparent transition cursor-pointer" onclick="select3DConcept('elemen', 'garisan')">(d) Mewakili ketegangan (tali gitar).</div>
+                                <div class="bg-slate-900 p-2 rounded-lg hover:border-orange-500/40 border border-transparent transition cursor-pointer" onclick="select3DConcept('elemen', 'garisan')">(e) Menunjukkan kestabilan dan kerehatan.</div>
+                                <div class="bg-slate-900 p-2 rounded-lg hover:border-orange-500/40 border border-transparent transition cursor-pointer" onclick="select3DConcept('elemen', 'garisan')">(f) Menunjukkan keseimbangan.</div>
+                                <div class="bg-slate-900 p-2 rounded-lg hover:border-orange-500/40 border border-transparent transition cursor-pointer" onclick="select3DConcept('elemen', 'garisan')">(g) Menunjukkan daya gerakan yang dinamik.</div>
+                                <div class="bg-slate-900 p-2 rounded-lg hover:border-orange-500/40 border border-transparent transition cursor-pointer" onclick="select3DConcept('elemen', 'garisan')">(h) Mewakili gerakan dan tenaga yang berpadu.</div>
+                                <div class="bg-slate-900 p-2 rounded-lg hover:border-orange-500/40 border border-transparent transition cursor-pointer" onclick="select3DConcept('elemen', 'garisan')">(i) Menunjukkan objek itu dekat (tebal) atau jauh (nipis).</div>
+                            </div>
+                        </div>
+
+                        <!-- 2 & 3: Rupa & Bentuk Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-orange-500/40 transition cursor-pointer" onclick="select3DConcept('elemen', 'rupa')">
+                                <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                                    <span class="bg-${themes[activeTheme].primary} text-slate-950 w-5 h-5 rounded-full flex items-center justify-center text-xs font-cyber font-bold">2</span>
+                                    <span>RUPA (2D)</span>
+                                </h3>
+                                <p contenteditable="true" class="text-xs text-slate-300 leading-relaxed mt-2">
+                                    Hasil pertemuan antara hujung garisan dengan permulaannya. Mempunyai ruang kawasan yang rata dan bersifat 2D (tidak berjisim).
+                                </p>
+                                <div class="flex items-center gap-4 mt-3 bg-slate-900 p-2.5 rounded-lg text-xs">
+                                    <div class="flex-1"><strong>Geometri:</strong> Rupa bersudut dan berpenjuru.</div>
+                                    <div class="w-px h-8 bg-slate-800"></div>
+                                    <div class="flex-1"><strong>Organik:</strong> Bebas dan tidak terikat pada bentuk khusus.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-orange-500/40 transition cursor-pointer" onclick="select3DConcept('elemen', 'bentuk')">
+                                <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                                    <span class="bg-${themes[activeTheme].primary} text-slate-950 w-5 h-5 rounded-full flex items-center justify-center text-xs font-cyber font-bold">3</span>
+                                    <span>BENTUK (3D)</span>
+                                </h3>
+                                <p contenteditable="true" class="text-xs text-slate-300 leading-relaxed mt-2">
+                                    Objek yang mempunyai ruang, isi padu, and mempunyai lebih daripada satu permukaan.
+                                </p>
+                                <div class="flex items-center gap-4 mt-3 bg-slate-900 p-2.5 rounded-lg text-xs">
+                                    <div class="flex-1"><strong>Bentuk Konkrit:</strong> Fizikal, boleh dipegang.</div>
+                                    <div class="w-px h-8 bg-slate-800"></div>
+                                    <div class="flex-1"><strong>Bentuk Ilusi:</strong> Gambar atau lukisan berbentuk 3D.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            elemen2: () => `
+                <div class="bg-[#0c1224]/80 rounded-2xl p-8 shadow-xl border border-slate-800">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+                        <div>
+                            <span class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber">BAB 1.1.2: ELEMEN REKA BENTUK</span>
+                            <h2 contenteditable="true" class="text-xl font-bold font-cyber text-white tracking-wide">Empat Elemen Baki (Tekstur, Saiz, Warna, Ruang)</h2>
+                        </div>
+                        <i class="fa-solid fa-palette text-xl text-slate-600"></i>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Tekstur -->
+                        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-orange-500/40 transition cursor-pointer space-y-2" onclick="select3DConcept('elemen', 'tekstur')">
+                            <h4 class="text-xs font-cyber text-${themes[activeTheme].primary} uppercase">4. Tekstur / Jalinan</h4>
+                            <p contenteditable="true" class="text-xs text-slate-300">
+                                Kesan fizikal atau visual pada permukaan objek. Contoh: Kasar, licin, halus, kersat, lembut, keras, berkilat.
+                            </p>
+                        </div>
+
+                        <!-- Saiz -->
+                        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-orange-500/40 transition cursor-pointer space-y-2" onclick="select3DConcept('elemen', 'saiz')">
+                            <h4 class="text-xs font-cyber text-${themes[activeTheme].primary} uppercase">5. Saiz</h4>
+                            <p contenteditable="true" class="text-xs text-slate-300">
+                                Ukuran atau dimensi bagi sesuatu objek bagi membandingkan produk dari aspek panjang, tinggi, lebar dan kedalaman objek.
+                            </p>
+                        </div>
+
+                        <!-- Warna -->
+                        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-orange-500/40 transition cursor-pointer space-y-2 col-span-1" onclick="select3DConcept('elemen', 'warna')">
+                            <h4 class="text-xs font-cyber text-${themes[activeTheme].primary} uppercase">6. Warna</h4>
+                            <p contenteditable="true" class="text-xs text-slate-300 mb-2">
+                                Pantulan cahaya yang dapat dikesan mata. Terbahagi kepada Primer (Merah, Kuning, Biru), Sekunder, dan Tertier.
+                            </p>
+                            <div class="grid grid-cols-2 gap-2 text-[10px]">
+                                <div class="bg-red-950/50 p-1.5 rounded border border-red-500/20">🔥 <strong>Warna Panas:</strong> Ceria, bersemangat (Merah, Jingga, Kuning).</div>
+                                <div class="bg-blue-950/50 p-1.5 rounded border border-blue-500/20">❄️ <strong>Warna Sejuk:</strong> Tenang, damai (Hijau, Biru, Ungu).</div>
+                            </div>
+                        </div>
+
+                        <!-- Ruang -->
+                        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-orange-500/40 transition cursor-pointer space-y-2 col-span-1" onclick="select3DConcept('elemen', 'ruang')">
+                            <h4 class="text-xs font-cyber text-${themes[activeTheme].primary} uppercase">7. Ruang</h4>
+                            <p contenteditable="true" class="text-xs text-slate-300 mb-2">
+                                Kawasan kosong di sekeliling atau di dalam sesuatu objek.
+                            </p>
+                            <div class="grid grid-cols-2 gap-2 text-[10px]">
+                                <div class="bg-slate-900 p-1.5 rounded">📦 <strong>Ruang Nyata:</strong> Ruang fizikal yang sebenar.</div>
+                                <div class="bg-slate-900 p-1.5 rounded">🖼️ <strong>Ruang Ilusi:</strong> Ruang lukisan / gambar.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            prinsip1: () => `
+                <div class="bg-[#0c1224]/80 rounded-2xl p-8 shadow-xl border border-slate-800">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+                        <div>
+                            <span class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber">BAB 1.1.3: PRINSIP REKA BENTUK</span>
+                            <h2 contenteditable="true" class="text-xl font-bold font-cyber text-white tracking-wide">Prinsip Komposisi (Bahagian 1)</h2>
+                        </div>
+                        <i class="fa-solid fa-scale-balanced text-xl text-slate-600"></i>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Keseimbangan -->
+                        <div class="p-5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-cyan-500/40 transition cursor-pointer space-y-2" onclick="select3DConcept('prinsip', 'keseimbangan')">
+                            <h3 class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber uppercase">1. Keseimbangan</h3>
+                            <p contenteditable="true" class="text-xs text-slate-300">
+                                Kesamaan pengagihan berat visual dari aspek saiz, bentuk, warna.
+                            </p>
+                            <div class="text-[10px] text-slate-400 space-y-1 bg-slate-900 p-2 rounded">
+                                <div>• <strong>Simetri (Formal):</strong> Kiri kanan sama.</div>
+                                <div>• <strong>Asimetri (Tidak Formal):</strong> Menarik & unik.</div>
+                            </div>
+                        </div>
+
+                        <!-- Pengulangan -->
+                        <div class="p-5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-cyan-500/40 transition cursor-pointer space-y-2" onclick="select3DConcept('prinsip', 'pengulangan')">
+                            <h3 class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber uppercase">2. Pengulangan</h3>
+                            <p contenteditable="true" class="text-xs text-slate-300">
+                                Penyusunan elemen yang sama berulang kali dari segi saiz atau bentuk bagi membentuk pola corak.
+                            </p>
+                        </div>
+
+                        <!-- Kontras -->
+                        <div class="p-5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-cyan-500/40 transition cursor-pointer space-y-2" onclick="select3DConcept('prinsip', 'kontras')">
+                            <h3 class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber uppercase">3. Kontras</h3>
+                            <p contenteditable="true" class="text-xs text-slate-300">
+                                Perbezaan ketara pada ciri elemen seperti kasar vs licin, saiz besar vs kecil, warna terang vs gelap.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            prinsip2: () => `
+                <div class="bg-[#0c1224]/80 rounded-2xl p-8 shadow-xl border border-slate-800">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+                        <div>
+                            <span class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber">BAB 1.1.3: PRINSIP REKA BENTUK</span>
+                            <h2 contenteditable="true" class="text-xl font-bold font-cyber text-white tracking-wide">Prinsip Komposisi (Bahagian 2)</h2>
+                        </div>
+                        <i class="fa-solid fa-object-group text-xl text-slate-600"></i>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Kepelbagaian -->
+                        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-cyan-500/40 transition cursor-pointer space-y-2" onclick="select3DConcept('prinsip', 'kepelbagaian')">
+                            <h3 class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber uppercase">4. Kepelbagaian</h3>
+                            <p contenteditable="true" class="text-xs text-slate-300">
+                                Aplikasi pelbagai gaya, idea, dan elemen berbeza untuk menambah daya tarikan produk.
+                            </p>
+                        </div>
+
+                        <!-- Kesatuan -->
+                        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-cyan-500/40 transition cursor-pointer space-y-2" onclick="select3DConcept('prinsip', 'kesatuan')">
+                            <h3 class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber uppercase">5. Kesatuan</h3>
+                            <p contenteditable="true" class="text-xs text-slate-300">
+                                Gabungan elemen membentuk sebuah tema, imej, atau idea yang sempurna serta tersusun.
+                            </p>
+                        </div>
+
+                        <!-- Keringkasan -->
+                        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-cyan-500/40 transition cursor-pointer space-y-2" onclick="select3DConcept('prinsip', 'keringkasan')">
+                            <h3 class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber uppercase">6. Keringkasan</h3>
+                            <p contenteditable="true" class="text-xs text-slate-300">
+                                Idea kompleks yang diringkaskan kepada visual ringkas tanpa menjejaskan nilai reka bentuk.
+                            </p>
+                        </div>
+
+                        <!-- Harmoni -->
+                        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-cyan-500/40 transition cursor-pointer space-y-2" onclick="select3DConcept('prinsip', 'harmoni')">
+                            <h3 class="text-xs font-bold text-${themes[activeTheme].primary} font-cyber uppercase">7. Harmoni</h3>
+                            <p contenteditable="true" class="text-xs text-slate-300">
+                                Susunan elemen yang memberikan kepuasan, kedamaian, dan ketenangan visual.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            kuiz: () => `
+                <div class="bg-[#0c1224]/80 rounded-2xl p-8 shadow-xl border border-slate-800 transition-all duration-300" id="quiz-block-card">
+                    <!-- Scoreboard & Animated Status Header -->
+                    <div class="flex flex-col md:flex-row items-center justify-between border-b border-slate-800 pb-4 mb-6 gap-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-purple-500/20 text-purple-400 p-3 rounded-xl text-xl glow-orange">
+                                <i class="fa-solid fa-gamepad"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-orange-400 uppercase tracking-widest font-cyber">Cabaran Ochobot RBT 15 Soalan</span>
+                                <h2 contenteditable="true" class="text-lg font-bold text-white font-cyber">KUIZ PERINGKAT KUASA</h2>
+                            </div>
+                        </div>
+                        
+                        <!-- SCOREBOARD -->
+                        <div class="flex items-center space-x-6 bg-[#0f162e] border border-orange-500/20 px-5 py-2.5 rounded-xl">
+                            <div class="text-center">
+                                <span class="text-[9px] uppercase font-bold text-slate-400 font-cyber">SOALAN</span>
+                                <div class="text-sm font-black text-white font-cyber" id="quiz-progress-text">1 / 15</div>
+                            </div>
+                            <div class="w-px h-8 bg-slate-800"></div>
+                            <div class="text-center">
+                                <span class="text-[9px] uppercase font-bold text-slate-400 font-cyber">KUASA TERAS</span>
+                                <div class="text-sm font-black text-cyan-400 font-cyber" id="quiz-score-text">0 / 15</div>
+                            </div>
+                            <div class="w-px h-8 bg-slate-800"></div>
+                            <div class="text-center">
+                                <span class="text-[9px] uppercase font-bold text-slate-400 font-cyber">PRESTASI</span>
+                                <div class="text-sm font-black text-emerald-400 font-cyber" id="quiz-percent-text">0%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QUIZ CONTENT CONTAINER (DYNAMICALLY MOUNTED) -->
+                    <div id="quiz-interactive-mount">
+                        <!-- Loaded dynamically by Javascript -->
+                    </div>
+                </div>
+            `
+        };
+
+        // Initialize Workspace with slides
+        window.onload = function() {
+            addSlide('hero');
+            addSlide('definisi');
+            addSlide('elemen1');
+            addSlide('elemen2');
+            addSlide('prinsip1');
+            addSlide('prinsip2');
+            addSlide('kuiz');
+            
+            init3DEngine(); // Boot Three.js Canvas
+            initQuizWizard(); // Initialize 15 Questions quiz state
+            checkChatbotConnectionMode(); // Auto-detect network mode on boot
+            showToast("Sistem Tech-Lab BoBoiBoy Bersedia!", "success");
+        };
+
+        function addSlide(type) {
+            if (!slideTemplates[type]) return;
+            
+            const wrapper = document.getElementById('web-layout-wrapper');
+            const uniqueId = 'slide_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            
+            const sectionDiv = document.createElement('div');
+            sectionDiv.id = uniqueId;
+            sectionDiv.className = "editable-section group relative";
+            sectionDiv.dataset.type = type;
+            
+            const controlsHTML = `
+                <div class="control-overlay absolute top-4 right-4 bg-slate-900/90 border border-orange-500/30 text-white rounded-xl shadow-2xl p-1.5 flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                    <button onclick="moveSlideUp('${uniqueId}')" class="p-1.5 hover:bg-orange-600 rounded text-xs transition duration-150" title="Gerak Ke Atas">
+                        <i class="fa-solid fa-arrow-up"></i>
+                    </button>
+                    <button onclick="moveSlideDown('${uniqueId}')" class="p-1.5 hover:bg-orange-600 rounded text-xs transition duration-150" title="Gerak Ke Bawah">
+                        <i class="fa-solid fa-arrow-down"></i>
+                    </button>
+                    <span class="w-px h-4 bg-slate-800"></span>
+                    <button onclick="duplicateSlide('${uniqueId}')" class="p-1.5 hover:bg-cyan-600 rounded text-xs transition duration-150" title="Duplikasi Slaid">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
+                    <button onclick="deleteSlide('${uniqueId}')" class="p-1.5 hover:bg-red-600 rounded text-xs transition duration-150" title="Padam Slaid">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+                <div class="editor-indicator absolute bottom-2 left-4 bg-gradient-to-r from-orange-600 to-red-600 text-white text-[9px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none font-cyber">
+                    Mod Penyunting Aktif
+                </div>
+            `;
+            
+            sectionDiv.innerHTML = controlsHTML + slideTemplates[type]();
+            wrapper.appendChild(sectionDiv);
+            
+            applyModeToElement(sectionDiv);
+
+            // Re-mount the quiz if added
+            if (type === 'kuiz') {
+                initQuizWizard();
+            }
+        }
+
+        // Dynamic navigation from element library blocks
+        function handleSidebarClick(type) {
+            const existingSlide = Array.from(document.querySelectorAll('.editable-section'))
+                                      .find(slide => slide.dataset.type === type);
+
+            if (existingSlide) {
+                existingSlide.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                existingSlide.classList.add('glow-flash');
+                setTimeout(() => {
+                    existingSlide.classList.remove('glow-flash');
+                }, 1500);
+                showToast(`Melompat ke modul ${type.toUpperCase()}!`, "info");
+                
+                // Trigger 3D Hologram projection for the specific slide category
+                if (type === 'elemen1') select3DConcept('elemen', 'bentuk');
+                else if (type === 'elemen2') select3DConcept('elemen', 'warna');
+                else if (type === 'prinsip1') select3DConcept('prinsip', 'keseimbangan');
+                else if (type === 'prinsip2') select3DConcept('prinsip', 'harmoni');
+            } else {
+                addSlide(type);
+                showToast(`Modul ${type.toUpperCase()} tiada dalam editor. Ditambah baru!`, "success");
+                
+                setTimeout(() => {
+                    const newlyCreated = Array.from(document.querySelectorAll('.editable-section'))
+                                              .find(slide => slide.dataset.type === type);
+                    if (newlyCreated) {
+                        newlyCreated.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        newlyCreated.classList.add('glow-flash');
+                        setTimeout(() => {
+                            newlyCreated.classList.remove('glow-flash');
+                        }, 1500);
+                    }
+                }, 150);
+            }
+        }
+
+        function deleteSlide(id) {
+            const slide = document.getElementById(id);
+            if (slide) {
+                slide.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    slide.remove();
+                    showToast("Slaid dibuang dari sistem", "warning");
+                }, 200);
+            }
+        }
+
+        function duplicateSlide(id) {
+            const original = document.getElementById(id);
+            if (!original) return;
+            
+            const wrapper = document.getElementById('web-layout-wrapper');
+            const uniqueId = 'slide_' + Date.now();
+            
+            const clone = original.cloneNode(true);
+            clone.id = uniqueId;
+            
+            const controlOverlay = clone.querySelector('.control-overlay');
+            controlOverlay.innerHTML = `
+                <button onclick="moveSlideUp('${uniqueId}')" class="p-1.5 hover:bg-orange-600 rounded text-xs transition" title="Gerak Ke Atas">
+                    <i class="fa-solid fa-arrow-up"></i>
+                </button>
+                <button onclick="moveSlideDown('${uniqueId}')" class="p-1.5 hover:bg-orange-600 rounded text-xs transition" title="Gerak Ke Bawah">
+                    <i class="fa-solid fa-arrow-down"></i>
+                </button>
+                <span class="w-px h-4 bg-slate-800"></span>
+                <button onclick="duplicateSlide('${uniqueId}')" class="p-1.5 hover:bg-cyan-600 rounded text-xs transition">
+                    <i class="fa-solid fa-copy"></i>
+                </button>
+                <button onclick="deleteSlide('${uniqueId}')" class="p-1.5 hover:bg-red-600 rounded text-xs transition">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            `;
+            
+            original.after(clone);
+            applyModeToElement(clone);
+
+            if (clone.dataset.type === 'kuiz') {
+                initQuizWizard();
+            }
+
+            showToast("Salinan slaid ditambahkan!", "success");
+        }
+
+        function moveSlideUp(id) {
+            const slide = document.getElementById(id);
+            const prev = slide.previousElementSibling;
+            if (prev) {
+                slide.parentNode.insertBefore(slide, prev);
+                slide.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function moveSlideDown(id) {
+            const slide = document.getElementById(id);
+            const next = slide.previousElementSibling;
+            if (next) {
+                slide.parentNode.insertBefore(next, slide);
+                slide.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function changeTheme(themeName) {
+            if (!themes[themeName]) return;
+            activeTheme = themeName;
+            
+            const slides = document.querySelectorAll('.editable-section');
+            slides.forEach(slide => {
+                const type = slide.dataset.type;
+                const textBeforeChange = [];
+                
+                slide.querySelectorAll('[contenteditable="true"]').forEach(el => {
+                    textBeforeChange.push(el.innerHTML);
+                });
+                
+                const controls = slide.querySelector('.control-overlay').outerHTML;
+                const indicator = slide.querySelector('.editor-indicator').outerHTML;
+                slide.innerHTML = controls + indicator + slideTemplates[type]();
+                
+                let i = 0;
+                slide.querySelectorAll('[contenteditable="true"]').forEach(el => {
+                    if (textBeforeChange[i]) {
+                        el.innerHTML = textBeforeChange[i];
+                    }
+                    i++;
+                });
+
+                if (type === 'kuiz') {
+                    initQuizWizard();
+                }
+            });
+            
+            // Re-render Three.js core light color
+            if (pointLight) {
+                pointLight.color.setHex(parseInt(themes[activeTheme].colorHex.replace('#', '0x')));
+            }
+            showToast(`Kuasa Elemen Bertukar Ke Mod ${themeName.toUpperCase()}!`, "info");
+        }
+
+        // Switching Editor & Preview Mode
+        function setMode(mode) {
+            currentMode = mode;
+            const container = document.getElementById('canvas-container');
+            const sidebar = document.getElementById('editor-sidebar');
+            const btnEdit = document.getElementById('btn-edit-mode');
+            const btnPreview = document.getElementById('btn-preview-mode');
+            
+            if (mode === 'edit') {
+                container.classList.add('edit-mode');
+                sidebar.classList.remove('-ml-80', 'opacity-0');
+                sidebar.classList.add('w-80');
+                
+                btnEdit.className = "px-5 py-2 rounded-full text-xs font-bold flex items-center space-x-2 transition-all bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg font-cyber";
+                btnPreview.className = "px-5 py-2 rounded-full text-xs font-bold flex items-center space-x-2 transition-all text-slate-400 hover:text-white font-cyber";
+                
+                document.querySelectorAll('.control-overlay, .editor-indicator').forEach(el => el.style.display = 'flex');
+                document.querySelectorAll('[contenteditable="true"]').forEach(el => el.setAttribute('contenteditable', 'true'));
+            } else {
+                container.classList.remove('edit-mode');
+                sidebar.classList.add('-ml-80', 'opacity-0');
+                sidebar.classList.remove('w-80');
+                
+                btnEdit.className = "px-5 py-2 rounded-full text-xs font-bold flex items-center space-x-2 transition-all text-slate-400 hover:text-white font-cyber";
+                btnPreview.className = "px-5 py-2 rounded-full text-xs font-bold flex items-center space-x-2 transition-all bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg font-cyber";
+                
+                document.querySelectorAll('.control-overlay, .editor-indicator').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('[contenteditable="true"]').forEach(el => el.setAttribute('contenteditable', 'false'));
+            }
+        }
+
+        function applyModeToElement(el) {
+            const overlay = el.querySelector('.control-overlay');
+            const indicator = el.querySelector('.editor-indicator');
+            const textEditable = el.querySelectorAll('[contenteditable]');
+            
+            if (currentMode === 'edit') {
+                if (overlay) overlay.style.display = 'flex';
+                if (indicator) indicator.style.display = 'block';
+                textEditable.forEach(t => t.setAttribute('contenteditable', 'true'));
+            } else {
+                if (overlay) overlay.style.display = 'none';
+                if (indicator) indicator.style.display = 'none';
+                textEditable.forEach(t => t.setAttribute('contenteditable', 'false'));
+            }
+        }
+
+        // 15-Question Quiz Logic Setup
+        function initQuizWizard() {
+            currentQuizIndex = 0;
+            userQuizScore = 0;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            const mount = document.getElementById('quiz-interactive-mount');
+            if (!mount) return;
+
+            // Update scoreboard indicators
+            const progressEl = document.getElementById('quiz-progress-text');
+            const scoreEl = document.getElementById('quiz-score-text');
+            const percentEl = document.getElementById('quiz-percent-text');
+
+            if (progressEl) progressEl.textContent = `${currentQuizIndex + 1} / 15`;
+            if (scoreEl) scoreEl.textContent = `${userQuizScore} / 15`;
+            if (percentEl) percentEl.textContent = `${Math.round((userQuizScore / 15) * 100)}%`;
+
+            if (currentQuizIndex >= 15) {
+                // Render Final Scoreboard screen
+                mount.innerHTML = `
+                    <div class="p-8 text-center bg-slate-950/80 border border-cyan-500/30 rounded-2xl space-y-6">
+                        <div class="text-yellow-400 text-6xl animate-bounce leading-none">🏆</div>
+                        <h3 class="text-xl font-extrabold text-white font-cyber uppercase tracking-wider">TAHNIAH! Selesai Cabaran RBT</h3>
+                        <p class="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
+                            Anda telah menamatkan semua 15 soalan reka bentuk. Mari lihat jumlah Tenaga Ochobot yang berjaya anda kumpulkan!
+                        </p>
+                        <div class="inline-block bg-[#0f162e] border-2 border-cyan-400 px-8 py-4 rounded-2xl shadow-[0_0_20px_rgba(0,204,255,0.2)]">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase font-cyber block tracking-widest">Markah Akhir Anda</span>
+                            <div class="text-3xl font-black text-white font-cyber">${userQuizScore} / 15</div>
+                            <div class="text-xs font-bold text-emerald-400 font-cyber mt-1">${Math.round((userQuizScore / 15) * 100)}% Kecekapan Kuasa</div>
+                        </div>
+                        <div class="pt-2">
+                            <button onclick="initQuizWizard()" class="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-bold text-xs font-cyber px-6 py-3 rounded-xl shadow-lg transition transform hover:scale-105">
+                                <i class="fa-solid fa-rotate"></i> Cuba Semula Cabaran
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const currentItem = quizDatabase[currentQuizIndex];
+            
+            // Build dynamic options buttons
+            let optionsHTML = '';
+            currentItem.options.forEach((opt, idx) => {
+                optionsHTML += `
+                    <button onclick="handleAnswerSelection(${idx})" class="w-full p-4 bg-slate-950 border border-slate-800 hover:border-orange-500 rounded-xl text-left text-slate-300 hover:text-white transition duration-200 focus:outline-none flex items-center justify-between group">
+                        <span>${opt}</span>
+                        <span class="w-5 h-5 rounded-full border border-slate-700 group-hover:border-orange-500 flex items-center justify-center text-[10px] text-slate-500 group-hover:text-orange-400 font-cyber transition">
+                            ${String.fromCharCode(65 + idx)}
+                        </span>
+                    </button>
+                `;
+            });
+
+            mount.innerHTML = `
+                <div class="space-y-4">
+                    <div class="p-5 bg-slate-950/80 border border-slate-800 rounded-xl flex items-start space-x-3.5 relative">
+                        <div class="bg-orange-500/10 text-orange-400 text-xs px-2.5 py-1.5 rounded-lg font-cyber font-bold shrink-0">
+                            Q${currentQuizIndex + 1}
+                        </div>
+                        <p class="text-xs font-bold text-slate-200 leading-relaxed">${currentItem.q}</p>
+                    </div>
+
+                    <!-- Animation Feedback Container Inside Card -->
+                    <div id="quiz-anim-feedback" class="hidden text-center py-4 rounded-xl flex flex-col items-center justify-center space-y-1"></div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="quiz-options-grid">
+                        ${optionsHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleAnswerSelection(selectedIdx) {
+            const currentItem = quizDatabase[currentQuizIndex];
+            const feedbackContainer = document.getElementById('quiz-anim-feedback');
+            const optionsGrid = document.getElementById('quiz-options-grid');
+            const quizCard = document.getElementById('quiz-block-card');
+            const isCorrect = (selectedIdx === currentItem.correct);
+
+            // Hide options list and show animations
+            if (optionsGrid) optionsGrid.classList.add('hidden');
+            if (feedbackContainer) feedbackContainer.classList.remove('hidden');
+
+            if (isCorrect) {
+                userQuizScore++;
+                // Happy Animation Trigger
+                feedbackContainer.innerHTML = `
+                    <div class="text-5xl animate-bounceglow mb-2 leading-none">٩(◕‿◕)۶ ✨</div>
+                    <h4 class="text-sm font-black text-emerald-400 font-cyber">JAWAPAN TEPAT!</h4>
+                    <p class="text-[10px] text-slate-400">Kuasa RBT Ochobot bertambah +10%!</p>
+                `;
+                feedbackContainer.className = "text-center py-6 bg-emerald-950/40 border border-emerald-500/30 rounded-xl animate-fadein";
+                showToast("Syabas! Jawapan tepat.", "success");
+            } else {
+                // Sad Animation Trigger
+                feedbackContainer.innerHTML = `
+                    <div class="text-5xl mb-2 leading-none"> (ಥ_ಥ) ⚡️</div>
+                    <h4 class="text-sm font-black text-red-500 font-cyber">GLITCH / SALAH!</h4>
+                    <p class="text-[10px] text-slate-400">Jawapan betul: <span class="text-emerald-400 font-bold">${currentItem.options[currentItem.correct]}</span></p>
+                `;
+                feedbackContainer.className = "text-center py-6 bg-red-950/40 border border-red-500/30 rounded-xl";
+                
+                // Card shake effect
+                if (quizCard) {
+                    quizCard.classList.add('animate-shake', 'glow-red');
+                    setTimeout(() => {
+                        quizCard.classList.remove('animate-shake', 'glow-red');
+                    }, 500);
+                }
+                showToast("Aduh! Jawapan kurang tepat.", "error");
+            }
+
+            // Move to next question after delay
+            setTimeout(() => {
+                currentQuizIndex++;
+                renderQuizQuestion();
+            }, 3000);
+        }
+
+        // CHATBOT CONTROLS & LOGIC
+        function toggleChatbot() {
+            const panel = document.getElementById('chatbot-panel');
+            if (panel) {
+                panel.classList.toggle('hidden');
+                // Scroll to bottom of chat
+                const msgBox = document.getElementById('chatbot-messages');
+                msgBox.scrollTop = msgBox.scrollHeight;
+            }
+        }
+
+        function handleChatInput(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function sendSuggestedMessage(text) {
+            const input = document.getElementById('chatbot-input');
+            if (input) {
+                input.value = text;
+                sendChatMessage();
+            }
+        }
+
+        // AUTOMATIC NETWORK & LOCATION DETECTION (TO RUN OFFLINE ON STANDALONE LOCAL DEVICES)
+        let isLocalOrOfflineMode = false;
+
+        function checkChatbotConnectionMode() {
+            const statusLabel = document.getElementById('chatbot-status-label');
+            
+            // Detect offline protocol or browser disconnection status
+            if (!navigator.onLine || window.location.protocol === 'file:') {
+                isLocalOrOfflineMode = true;
+                if (statusLabel) {
+                    statusLabel.className = "text-[9px] text-orange-400 font-extrabold uppercase font-cyber flex items-center gap-1.5";
+                    statusLabel.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span> ⚡ Mod Sfera Tempatan (Offline)`;
+                }
+            } else {
+                isLocalOrOfflineMode = false;
+                if (statusLabel) {
+                    statusLabel.className = "text-[9px] text-emerald-400 font-extrabold uppercase font-cyber flex items-center gap-1.5";
+                    statusLabel.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> 🟢 Mod Gemini AI (Sangat Pintar)`;
+                }
+            }
+        }
+
+        // Listen for internet state changes dynamically
+        window.addEventListener('online', checkChatbotConnectionMode);
+        window.addEventListener('offline', checkChatbotConnectionMode);
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatbot-input');
+            const messageText = input.value.trim();
+            if (!messageText) return;
+
+            input.value = '';
+
+            // Render User Bubble
+            appendChatBubble(messageText, 'user');
+
+            // Recalculate mode in case connection dropped
+            checkChatbotConnectionMode();
+
+            // Render Loader / Typing Indicator
+            const loaderId = appendChatBubble(
+                isLocalOrOfflineMode ? 'Ochobot memproses litar memori tempatan...' : 'Ochobot sedang memikirkan jawapan...', 
+                'system-loader'
+            );
+
+            // If we are strictly in offline/local downloaded mode, trigger advanced offline NLP engine instantly
+            if (isLocalOrOfflineMode) {
+                setTimeout(() => {
+                    const loaderNode = document.getElementById(loaderId);
+                    if (loaderNode) loaderNode.remove();
+
+                    const fallbackReply = generateOfflineRBTReply(messageText);
+                    appendChatBubble(fallbackReply, 'ai');
+                }, 800); // Small procedural delay to mimic processing
+                return;
+            }
+
+            try {
+                const RBT_SystemPrompt = `
+                    Anda adalah Ochobot AI, sfera kuasa pembantu pintar bertema siri animasi BoBoiBoy.
+                    Tanggungjawab anda adalah untuk menjawab soalan daripada awak (user) tentang subjek "Reka Bentuk dan Teknologi Tingkatan 1 (Bab 1: Pengenalan kepada Reka Bentuk dan Teknologi)".
+
+                    GAYA BERKOMUNIKASI (SANGAT PENTING):
+                    - Berkomunikasi seperti KAWAN BAIK yang santai, mesra, sopan dan tidak kaku.
+                    - Gunakan kata ganti nama "saya" (untuk Ochobot) dan "awak" (untuk user). JANGAN gunakan kata kasar/tidak sopan atau aku/kau.
+                    - Gunakan panggilan mesra seperti "awak", "kawan saya", atau selingan santai BoBoiBoy (seperti "Dey!", "Gempaklah!", "Kuasa RBT!", "Sfera Kuasa!", "Alamak!").
+                    - Sesuaikan nada suara dengan santai tetapi tetap sopan dan baik. Sembang dengan bersahaja!
+
+                    KANDUNGAN RUJUKAN BAB 1 (Gunakan data ini untuk jawapan grounded):
+                    1. Definisi RBT: Gabungan pengetahuan penyusunan bahan secara terancang dengan mengaplikasikan sains dan matematik.
+                    2. Bidang Reka Bentuk:
+                       - Konkrit (Boleh dipegang): Mesin, pakaian, makanan, peralatan.
+                       - Abstrak (Tak boleh dipegang): Sistem pengairan, atur cara, iklan, bahasa.
+                    3. 7 Elemen Reka Bentuk: Garisan (mempunyai 9 fungsi utama A-I, contoh tali gitar, paip air, kereta api), Rupa (2D: Geometri & Organik), Bentuk (3D: Konkrit & Ilusi), Tekstur (kasar/licin), Saiz, Warna (Panas vs Sejuk), Ruang (Nyata vs Ilusi).
+                    4. 7 Prinsip Reka Bentuk: Keseimbangan (Simetri/Asimetri), Pengulangan, Kontras, Kepelbagaian, Kesatuan, Keringkasan, Harmoni.
+                `;
+
+                const apiKey = ""; // Runtime environments supply keys automatically
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: messageText }] }],
+                        systemInstruction: {
+                            parts: [{ text: RBT_SystemPrompt }]
+                        },
+                    })
+                });
+
+                const result = await response.json();
+                const aiResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                // Remove loading bubble
+                const loaderNode = document.getElementById(loaderId);
+                if (loaderNode) loaderNode.remove();
+
+                if (aiResponse) {
+                    appendChatBubble(aiResponse, 'ai');
+                } else {
+                    appendChatBubble("Maaf kawan, teras Ochobot mengalami gangguan litar seketika. Sila cuba lagi! ⚡️", 'ai');
+                }
+
+            } catch (error) {
+                console.error("Gemini API error, falling back to Local Core:", error);
+                const loaderNode = document.getElementById(loaderId);
+                if (loaderNode) loaderNode.remove();
+                
+                // Fallback gracefully to offline engine
+                const fallbackReply = generateOfflineRBTReply(messageText);
+                appendChatBubble(fallbackReply, 'ai');
+                showToast("Teras Tempatan Diaktifkan (Offline Mode)", "warning");
+            }
+        }
+
+        // ADVANCED OFFLINE RULE-BASED INTENT PARSER WITH WEIGHTED SCORING
+        // Allows high fidelity responses even when the website is downloaded as a standalone .html file
+        function generateOfflineRBTReply(text) {
+            const query = text.toLowerCase().trim();
+            
+            // Helper function to check if query contains any keywords and calculate weighted match
+            const matchKeywords = (list) => {
+                let score = 0;
+                list.forEach(keyword => {
+                    if (query.includes(keyword)) score++;
+                });
+                return score;
+            };
+
+            // Intent 1: Definisi RBT / Pengenalan
+            if (matchKeywords(['maksud', 'definisi', 'apa itu', 'takrif']) > 0 && matchKeywords(['rbt', 'reka bentuk', 'teknologi']) > 0) {
+                return "Dey! Penjelasan tentang **Reka Bentuk dan Teknologi (RBT)** ada di dalam pangkalan data memori saya! ⚡️\n\n" +
+                       "• **Reka Bentuk**: Pengetahuan tentang penyusunan bahan secara terancang untuk menghasilkan sesuatu produk yang impak visualnya menarik.\n" +
+                       "• **Teknologi**: Pengaplikasian ilmu sains dan matematik dengan menggunakan pelbagai sumber semula jadi untuk memudahkan kehidupan kita.\n\n" +
+                       "**Kesimpulannya**: RBT ialah gabungan penyusunan bahan secara terancang dengan mengaplikasikan sains dan matematik bagi memudahkan urusan harian kawan-kawan! Terbaiklah! 👍";
+            }
+
+            // Intent 2: Elemen (Keseluruhan)
+            if (matchKeywords(['elemen', 'sebutkan elemen', 'senarai elemen', '7 elemen', 'unsur']) > 0) {
+                return "Kuasa 7 Elemen Reka Bentuk! Ini adalah 'ramuan asas' yang pereka gunakan untuk membina apa-apa lakaran atau produk, kawan! 📦:\n\n" +
+                       "1. **Garisan** - Cantuman titik berterusan (cth: tali gitar).\n" +
+                       "2. **Rupa** - Garisan rata yang bertemu hujung (2D, tiada jisim).\n" +
+                       "3. **Bentuk** - Objek 3D yang mempunyai isi padu dan ruang nyata.\n" +
+                       "4. **Tekstur** - Jalinan kasar, licin, atau berkilat pada permukaan.\n" +
+                       "5. **Saiz** - Dimensi (panjang, lebar, kedalaman) untuk pembandingan.\n" +
+                       "6. **Warna** - Pantulan cahaya yang memberi kesan emosi (Panas vs Sejuk).\n" +
+                       "7. **Ruang** - Kawasan kosong di sekeliling atau di dalam objek.\n\n" +
+                       "💡 *Tip Gempak*: Awak boleh klik butang elemen pada paparan 3D Ochobot di atas untuk melihat simulasi hologram bagi setiap elemen ini! Cuba klik 'Garisan' atau 'Bentuk'!";
+            }
+
+            // Intent 3: Prinsip (Keseluruhan)
+            if (matchKeywords(['prinsip', 'sebutkan prinsip', '7 prinsip', 'peraturan reka']) > 0) {
+                return "Alamak! Nak tahu tentang **Prinsip Reka Bentuk** pula? Prinsip ialah peraturan atau panduan untuk menyusun elemen tadi supaya produk nampak seimbang dan gempak! 🎨:\n\n" +
+                       "1. **Keseimbangan** - Pengagihan visual yang sama (Simetri lwn Asimetri).\n" +
+                       "2. **Pengulangan** - Susunan corak yang berulang (cth: tapak kasut).\n" +
+                       "3. **Kontras** - Elemen bertentangan yang ketara (cth: cerah lwn gelap).\n" +
+                       "4. **Kepelbagaian** - Gabungan pelbagai elemen biar produk tak bosan.\n" +
+                       "5. **Kesatuan (Unity)** - Elemen yang bergabung membentuk satu tema harmoni.\n" +
+                       "6. **Keringkasan** - Pengolahan idea yang ringkas dan mudah difahami.\n" +
+                       "7. **Harmoni** - Susunan visual yang aman dan memberikan ketenangan.\n\n" +
+                       "💡 *Tip Kuasa*: Klik butang prinsip pada stesen hologram 3D di atas (contohnya 'Keseimbangan' atau 'Harmoni') untuk memproyeksikan visual dinamik secara terus!";
+            }
+
+            // Intent 4: Konkrit vs Abstrak / Bidang
+            if (matchKeywords(['konkrit', 'abstrak', 'maujud', 'mujarad', 'beza konkrit', 'bidang']) > 0) {
+                return "Sfera memori saya mengesan perbezaan **Konkrit (Maujud)** dan **Abstrak (Mujarad)**! Jom Ochobot jelaskan: ⚙️\n\n" +
+                       "• **Reka Bentuk Konkrit**: Benda-benda fizikal yang kita boleh pegang, sentuh dan rasa.\n" +
+                       "  - *Kumpulan Teknologi*: Pakaian, makanan, mesin, peralatan (cth: telefon, kereta).\n" +
+                       "  - *Kumpulan Seni*: Seramik, sulaman, arca, masakan.\n\n" +
+                       "• **Reka Bentuk Abstrak**: Perkara bukan fizikal yang kita tak boleh pegang, tetapi boleh dirasai dan dilihat kesannya.\n" +
+                       "  - *Kumpulan Komunikasi*: Atur cara (coding), pengiklanan, grafik, bahasa.\n" +
+                       "  - *Kumpulan Perkhidmatan*: Pengangkutan, sistem pengairan, sewaan.";
+            }
+
+            // Intent 5: Garisan & Fungsinya (Sangat kerap ditanya)
+            if (matchKeywords(['garisan', 'line', 'fungsi garisan', '9 fungsi']) > 0) {
+                return "Garisan adalah cantuman titik berterusan yang paling asas, kawan! RBT Tingkatan 1 menekankan **9 fungsi garisan** utama:\n\n" +
+                       "• *(a) Membahagikan kawasan* (cth: padang bola).\n" +
+                       "• *(b) Menunjukkan arah* (cth: papan tanda).\n" +
+                       "• *(c) Menunjukkan perhubungan* (cth: peta minda).\n" +
+                       "• *(d) Mewakili ketegangan* (cth: **tali gitar** yang tegang).\n" +
+                       "• *(e) Menunjukkan kestabilan* (cth: garisan bata melintang).\n" +
+                       "• *(f) Menunjukkan keseimbangan*.\n" +
+                       "• *(g) Menunjukkan daya gerakan dinamik*.\n" +
+                       "• *(h) Menunjukkan tenaga yang berpadu*.\n" +
+                       "• *(i) Menunjukkan dekat atau jauh* (tebal lwn nipis).\n\n" +
+                       "🎸 *Soalan Kuiz*: Ingat ya, tali gitar sentiasa mewakili **ketegangan**!";
+            }
+
+            // Intent 6: Rupa vs Bentuk (Kerap mengelirukan pelajar)
+            if (matchKeywords(['rupa', 'bentuk', 'beza rupa', 'geometri', 'organik']) > 0) {
+                return "Oh, beza **Rupa** dengan **Bentuk** selalu keluar peperiksaan RBT tau, kawan! 📐\n\n" +
+                       "1. **Rupa (2D)**: Pertemuan hujung garisan dengan permulaannya. Bersifat **rata (2D)**, tidak mempunyai isi padu atau bayang-bayang.\n" +
+                       "   - *Geometri*: Bersudut tepat (bulatan, segi empat, segi tiga).\n" +
+                       "   - *Organik*: Bebas dan tidak terikat (cth: rupa daun, rupa tumpahan dakwat).\n\n" +
+                       "2. **Bentuk (3D)**: Objek **3D** yang mempunyai ruang dan **isi padu** yang nyata (cth: silinder, sfera, piramid).\n" +
+                       "   - *Bentuk Konkrit*: Kerusi fizikal.\n" +
+                       "   - *Bentuk Ilusi*: Lukisan kerusi 3D di atas kertas.\n\n" +
+                       "Ingat: Rupa itu flat 2D, Bentuk itu ada isi padu 3D!";
+            }
+
+            // Intent 7: Warna (Panas vs Sejuk)
+            if (matchKeywords(['warna', 'sejuk', 'panas', 'primer', 'sekunder', 'tertier']) > 0) {
+                return "Warna terhasil daripada pantulan cahaya pada objek, awak! Kita bahagikan warna kepada dua kumpulan psikologi:\n\n" +
+                       "🔥 **Warna Panas**: Melambangkan tenaga, keceriaan, kehangatan, dan semangat yang berkobar-kobar.\n" +
+                       "  - *Warna*: Merah, jingga, kuning.\n" +
+                       "  - *Sifat*: Nampak garang dan bertenaga (seperti Kuasa Halilintar!).\n\n" +
+                       "❄️ **Warna Sejuk**: Melambangkan ketenangan, damai, kesejukan, dan kedamaian visual.\n" +
+                       "  - *Warna*: Biru, hijau, ungu.\n" +
+                       "  - *Sifat*: Menyejukkan mata memandang.";
+            }
+
+            // Intent 8: Kontras vs Keseimbangan
+            if (matchKeywords(['kontras', 'seimbang', 'keseimbangan', 'simetri', 'asimetri']) > 0) {
+                return "Mari kita bezakan dua prinsip ini: ⚖️\n\n" +
+                       "• **Keseimbangan**: Kesamaan berat visual objek.\n" +
+                       "  - *Simetri*: Kiri dan kanan sama berat dan rupa (formal).\n" +
+                       "  - *Asimetri*: Kiri dan kanan tak sama rupa tapi berat visual tetap seimbang (tidak formal).\n\n" +
+                       "• **Prinsip Kontras**: Perbezaan ketara pada ciri elemen (cth: sofa kuning terang di persekitaran bilik gelap). Kontras penting untuk **menarik perhatian** pengguna kepada elemen tertentu!";
+            }
+
+            // Intent 9: Gopal / BoBoiBoy Trivia Easter Eggs (Untuk mengekalkan keseronokan animasi)
+            if (matchKeywords(['gopal', 'yaya', 'ying', 'fang', 'adudu', 'tok aba', 'boboiboy', 'kuasa']) > 0) {
+                return "Dey! Jangan sebut nama Gopal di stesen RBT ni, nanti dia tukarkan mesin 3D Ochobot jadi coklat atau biskut daki lagi! Alamak! 🍫\n\n" +
+                       "Tapi kalau kawan-kawan nak tahu, BoBoiBoy selalu gunakan prinsip **Kesatuan (Unity)** bila dia bertukar kepada Kuasa Tiga atau Kuasa Tujuh untuk bekerjasama mengalahkan musuh! Pembelajaran RBT pun memerlukan kesatuan semua elemen supaya reka bentuk produk kelihatan harmoni dan gempak!";
+            }
+
+            // Intent 10: Hello / Greeting / Chatbot Praise
+            if (matchKeywords(['hi', 'hello', 'hai', 'ochobot', 'hebat', 'terbaik', 'terima kasih', 'apa khabar']) > 0) {
+                return "Hai kawan baik Ochobot! Khabar baik! Teras kuasa saya dalam keadaan 100% optimum dan sedia menjawab semua kemusykilan RBT awak. 👍\n\n" +
+                       "Tanya je saya apa-apa soalan sukatan Tingkatan 1, ataupun kawan-kawan boleh terus jawab Kuiz 15 Soalan di slaid bawah. Jom belajar!";
+            }
+
+            // Default Offline Response (Fallback)
+            return "Sfera memori tempatan Ochobot sedia mendengar, kawan! ⚡️\n\n" +
+                   "Maaf, saya tidak mengesan internet yang aktif untuk menganalisis ayat itu secara meluas. Tetapi saya tahu semua kandungan RBT! Sila tanyakan soalan menggunakan kata kunci ringkas seperti:\n" +
+                   "• *'Apakah maksud RBT?'*\n" +
+                   "• *'Senaraikan 7 elemen'* atau *'7 prinsip'*\n" +
+                   "• *'Apa itu konkrit dan abstrak?'*\n" +
+                   "• *'Terangkan fungsi garisan'* atau *'perbezaan rupa dan bentuk'*\n" +
+                   "• *'Apakah kumpulan warna panas?'*";
+        }
+
+        function appendChatBubble(text, sender) {
+            const msgBox = document.getElementById('chatbot-messages');
+            if (!msgBox) return;
+
+            const bubbleId = 'bubble_' + Date.now() + '_' + Math.floor(Math.random() * 100);
+            const div = document.createElement('div');
+            div.id = bubbleId;
+            div.className = "flex items-start space-x-2";
+
+            if (sender === 'user') {
+                div.innerHTML = `
+                    <div class="bg-orange-500/10 text-orange-400 p-1.5 rounded-lg text-[10px] font-cyber mt-1 shrink-0">AWAK</div>
+                    <div class="bg-[#0f162e] border border-orange-500/20 p-3 rounded-xl text-slate-200 max-w-[80%] leading-relaxed ml-auto">
+                        ${text}
+                    </div>
+                `;
+            } else if (sender === 'ai') {
+                div.innerHTML = `
+                    <div class="bg-cyan-950 p-1.5 rounded-lg text-cyan-400 text-[10px] font-cyber mt-1 shrink-0">AI</div>
+                    <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl text-slate-300 max-w-[80%] leading-relaxed">
+                        ${text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}
+                    </div>
+                `;
+            } else if (sender === 'system-loader') {
+                div.innerHTML = `
+                    <div class="bg-slate-800 p-1.5 rounded-lg text-slate-400 text-[10px] font-cyber mt-1 shrink-0">AI</div>
+                    <div class="bg-slate-900/40 p-3 rounded-xl text-slate-500 max-w-[80%] leading-relaxed animate-pulse">
+                        ${text}
+                    </div>
+                `;
+            }
+
+            msgBox.appendChild(div);
+            msgBox.scrollTop = msgBox.scrollHeight;
+            return bubbleId;
+        }
+
+        // DATABASE FOR 3D HUD AND DYNAMIC CONCEPT INFOGRAPHICS
+        const rbt3DDatabase = {
+            elemen: {
+                garisan: {
+                    title: "Elemen: Garisan",
+                    cat: "7 Elemen Reka Bentuk",
+                    desc: "Cantuman siri titik yang mempunyai ukuran panjang dan jarak. Mempunyai 9 fungsi utama (contoh: tali gitar untuk menunjukkan ketegangan, landasan kereta api untuk menunjukkan arah)."
+                },
+                rupa: {
+                    title: "Elemen: Rupa (2D)",
+                    cat: "7 Elemen Reka Bentuk",
+                    desc: "Hasil pertemuan hujung garisan dengan permulaannya. Bersifat 2D (rata dan tiada isi padu). Terdiri daripada Rupa Geometri (bersudut) dan Rupa Organik (bebas/semulajadi)."
+                },
+                bentuk: {
+                    title: "Elemen: Bentuk (3D)",
+                    cat: "7 Elemen Reka Bentuk",
+                    desc: "Objek yang mempunyai ruang, isi padu, dan lebih daripada satu permukaan. Terdiri daripada Bentuk Konkrit (fizikal boleh dipegang) dan Bentuk Ilusi (visualisasi gambar 3D)."
+                },
+                tekstur: {
+                    title: "Elemen: Tekstur",
+                    cat: "7 Elemen Reka Bentuk",
+                    desc: "Kesan fizikal atau visual pada permukaan objek yang boleh dirasai melalui deria sentuhan atau penglihatan (cth: permukaan tayar yang kasar untuk cengkaman)."
+                },
+                saiz: {
+                    title: "Elemen: Saiz",
+                    cat: "7 Elemen Reka Bentuk",
+                    desc: "Ukuran atau dimensi bagi sesuatu objek. Digunakan untuk membandingkan perbezaan skala, kedalaman, dan memberi impak visual kepada pengguna."
+                },
+                warna: {
+                    title: "Elemen: Warna",
+                    cat: "7 Elemen Reka Bentuk",
+                    desc: "Pantulan cahaya yang dikesan oleh mata manusia. Warna mempengaruhi emosi dan psikologi manusia (cth: Warna Panas melambangkan tenaga; Warna Sejuk melambangkan kedamaian)."
+                },
+                ruang: {
+                    title: "Elemen: Ruang",
+                    cat: "7 Elemen Reka Bentuk",
+                    desc: "Kawasan kosong yang dikelilingi oleh elemen garisan atau objek. Terbahagi kepada Ruang Nyata (ruang fizikal sebenar) dan Ruang Ilusi (perspektif dalam lakaran)."
+                }
+            },
+            prinsip: {
+                keseimbangan: {
+                    title: "Prinsip: Keseimbangan",
+                    cat: "7 Prinsip Reka Bentuk",
+                    desc: "Kesamaan pengagihan berat visual dari segi saiz, bentuk, warna dan kedudukan. Terbahagi kepada Keseimbangan Simetri (Formal) dan Keseimbangan Asimetri (Tidak Formal)."
+                },
+                pengulangan: {
+                    title: "Prinsip: Pengulangan",
+                    cat: "7 Prinsip Reka Bentuk",
+                    desc: "Penyusunan elemen yang sama berulang kali secara tersusun bagi menghasilkan pola, corak, atau irama visual yang menarik."
+                },
+                kontras: {
+                    title: "Prinsip: Kontras",
+                    cat: "7 Prinsip Reka Bentuk",
+                    desc: "Perbezaan ketara pada ciri elemen yang digunakan (seperti saiz besar lwn kecil, warna gelap lwn terang). Bertujuan menarik perhatian dan memberi fokus utama."
+                },
+                kepelbagaian: {
+                    title: "Prinsip: Kepelbagaian",
+                    cat: "7 Prinsip Reka Bentuk",
+                    desc: "Penggunaan pelbagai gaya, nilai, and idea yang berbeza dalam sesuatu reka bentuk untuk menambah daya tarikan dan mengelakkan rasa bosan."
+                },
+                kesatuan: {
+                    title: "Prinsip: Kesatuan",
+                    cat: "7 Prinsip Reka Bentuk",
+                    desc: "Gabungan semua elemen dan bahagian struktur secara harmoni untuk membentuk sebuah tema, imej, atau idea reka bentuk yang sempurna dan lengkap."
+                },
+                keringkasan: {
+                    title: "Prinsip: Keringkasan",
+                    cat: "7 Prinsip Reka Bentuk",
+                    desc: "Pengolahan idea kompleks dalam bentuk visual yang ringkas dan padat tanpa menjejaskan estetika atau fungsi produk bagi memudahkan kefahaman pengguna."
+                },
+                harmoni: {
+                    title: "Prinsip: Harmoni",
+                    cat: "7 Prinsip Reka Bentuk",
+                    desc: "Susunan elemen yang memberikan kepuasan visual, keamanan, dan ketenangan. Menghasilkan tema yang selaras tanpa percanggahan yang drastik."
+                }
+            }
+        };
+
+        // THREE.JS 3D ENGINE LOGIC WITH ENHANCED RBT OBJECTS
+        let scene, camera, renderer, mainContainer3D, pointLight, secondaryLight;
+        let activeRBTGroup = null; // Holds the currently active 3D representation
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        function init3DEngine() {
+            const container = document.getElementById('canvas3d-container');
+            if (!container) return;
+            
+            // 1. Scene Setup
+            scene = new THREE.Scene();
+            
+            // 2. Camera Setup
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 8;
+
+            // 3. Renderer Setup
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // 4. Create Main Container Group for automatic/manual rotations
+            mainContainer3D = new THREE.Group();
+            scene.add(mainContainer3D);
+
+            // 5. Lighting Setup
+            const ambientLight = new THREE.AmbientLight(0x0f172a, 1.8);
+            scene.add(ambientLight);
+
+            pointLight = new THREE.PointLight(0xff5500, 3.5, 50);
+            pointLight.position.set(4, 5, 4);
+            scene.add(pointLight);
+
+            secondaryLight = new THREE.PointLight(0x00ccff, 2.5, 50);
+            secondaryLight.position.set(-4, -5, 2);
+            scene.add(secondaryLight);
+
+            // 6. Spawn Default Ochobot Power Core
+            loadDefaultOchobotCore();
+
+            // 7. Interactive Controls
+            container.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            container.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const deltaMove = {
+                    x: e.clientX - previousMousePosition.x,
+                    y: e.clientY - previousMousePosition.y
+                };
+
+                mainContainer3D.rotation.y += deltaMove.x * 0.005;
+                mainContainer3D.rotation.x += deltaMove.y * 0.005;
+
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            window.addEventListener('mouseup', () => { isDragging = false; });
+
+            // Mobile Touch Events Support
+            container.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }, { passive: true });
+
+            container.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const deltaMove = {
+                    x: e.touches[0].clientX - previousMousePosition.x,
+                    y: e.touches[0].clientY - previousMousePosition.y
+                };
+
+                mainContainer3D.rotation.y += deltaMove.x * 0.008;
+                mainContainer3D.rotation.x += deltaMove.y * 0.008;
+
+                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }, { passive: true });
+
+            // 8. Animation/Render Loop
+            function animate() {
+                requestAnimationFrame(animate);
+
+                // Idle Ambient Rotation when not manual dragging
+                if (!isDragging) {
+                    mainContainer3D.rotation.y += 0.003;
+                }
+
+                // Custom animations based on active object
+                if (activeRBTGroup && activeRBTGroup.userData && activeRBTGroup.userData.animate) {
+                    activeRBTGroup.userData.animate();
+                }
+
+                renderer.render(scene, camera);
+            }
+
+            // Canvas Resizing Support
+            window.addEventListener('resize', () => {
+                if (container.clientWidth && container.clientHeight) {
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                }
+            });
+
+            animate();
+        }
+
+        // DYNAMIC 3D SCENE TRANSITIONS (REVEALING OBJECTS PROCEDURALLY)
+        function clearActive3DObject() {
+            if (activeRBTGroup) {
+                mainContainer3D.remove(activeRBTGroup);
+                activeRBTGroup = null;
+            }
+        }
+
+        // DEFAULT OCHOBOT CORE
+        function loadDefaultOchobotCore() {
+            clearActive3DObject();
+
+            activeRBTGroup = new THREE.Group();
+            
+            // Outer Glowing Spherical Grid
+            const coreGeometry = new THREE.SphereGeometry(1.2, 16, 16);
+            const coreMaterial = new THREE.MeshBasicMaterial({
+                color: 0xff5500,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.6
+            });
+            const outerShell = new THREE.Mesh(coreGeometry, coreMaterial);
+            activeRBTGroup.add(outerShell);
+
+            // Inner solid core representing elemental power
+            const innerGeom = new THREE.SphereGeometry(0.7, 32, 32);
+            const innerMat = new THREE.MeshPhongMaterial({
+                color: 0xff3c00,
+                emissive: 0xff5500,
+                shininess: 100
+            });
+            const innerCore = new THREE.Mesh(innerGeom, innerMat);
+            activeRBTGroup.add(innerCore);
+
+            // Torus mechanical rings
+            const ringGeom = new THREE.TorusGeometry(1.8, 0.05, 8, 50);
+            const ringMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.9 });
+            const orbitalRing = new THREE.Mesh(ringGeom, ringMat);
+            orbitalRing.rotation.x = Math.PI / 2;
+            activeRBTGroup.add(orbitalRing);
+
+            activeRBTGroup.userData = {
+                animate: () => {
+                    outerShell.rotation.y += 0.005;
+                    outerShell.rotation.z -= 0.003;
+                    orbitalRing.rotation.z += 0.01;
+                }
+            };
+
+            mainContainer3D.add(activeRBTGroup);
+            mainContainer3D.rotation.set(0.3, 0.5, 0); // Reset angle nicely
+        }
+
+        // SELECTIVE 3D RENDER ENGINE STATE MACHINE (7 ELEMEN & 7 PRINSIP CREATIVE DESIGNS)
+        function select3DConcept(category, conceptKey) {
+            const data = rbt3DDatabase[category]?.[conceptKey];
+            if (!data) return;
+
+            // Highlight chosen button
+            document.querySelectorAll('[id^="btn-3d-"]').forEach(btn => {
+                btn.className = btn.className.replace('bg-orange-600', 'bg-slate-900')
+                                             .replace('bg-cyan-600', 'bg-slate-900')
+                                             .replace('text-white', 'text-slate-300');
+            });
+            
+            const btn = document.getElementById(`btn-3d-${conceptKey}`);
+            if (btn) {
+                const colorClass = category === 'elemen' ? 'bg-orange-600' : 'bg-cyan-600';
+                btn.className = btn.className.replace('bg-slate-900', colorClass).replace('text-slate-300', 'text-white');
+            }
+
+            // Update Dynamic Educational HUD Info
+            document.getElementById('hologram-cat').textContent = data.cat;
+            document.getElementById('hologram-title').textContent = data.title;
+            document.getElementById('hologram-desc').textContent = data.desc;
+
+            // Update HUD Panel Border Color & Shadows dynamically based on category
+            const panel = document.getElementById('hologram-hud-panel');
+            if (panel) {
+                if (category === 'elemen') {
+                    panel.className = panel.className.replace(/border-cyan-500\/20|border-cyan-500\/30/g, 'border-orange-500/30')
+                                                     .replace('shadow-[0_0_15px_rgba(6,182,212,0.15)]', 'shadow-[0_0_15px_rgba(255,85,0,0.15)]');
+                    // Add orange text categories
+                    document.getElementById('hologram-cat').className = "text-[9px] font-bold text-orange-400 tracking-widest uppercase block font-cyber";
+                } else {
+                    panel.className = panel.className.replace(/border-orange-500\/20|border-orange-500\/30/g, 'border-cyan-500/30')
+                                                     .replace('shadow-[0_0_15px_rgba(255,85,0,0.15)]', 'shadow-[0_0_15px_rgba(6,182,212,0.15)]');
+                    // Add cyan text categories
+                    document.getElementById('hologram-cat').className = "text-[9px] font-bold text-cyan-400 tracking-widest uppercase block font-cyber";
+                }
+                
+                // Trigger dynamic Sci-Fi flash indicator
+                panel.classList.add('glow-flash');
+                setTimeout(() => {
+                    panel.classList.remove('glow-flash');
+                }, 1500);
+            }
+
+            // Clear old mesh & load brand new RBT Procedural Mesh
+            clearActive3DObject();
+            activeRBTGroup = new THREE.Group();
+
+            const primaryColor = category === 'elemen' ? 0xff5500 : 0x06b6d4;
+
+            switch(conceptKey) {
+                // ==================== 7 ELEMEN VISUALISATIONS ====================
+                case 'garisan':
+                    // Glowing Grid/Pulse wave representing Lines
+                    const linesNum = 15;
+                    const linesGroup = new THREE.Group();
+                    const lineMaterial = new THREE.LineBasicMaterial({ color: primaryColor });
+
+                    for (let i = 0; i < linesNum; i++) {
+                        const points = [];
+                        const ratio = (i / linesNum) - 0.5;
+                        for (let j = 0; j < 30; j++) {
+                            const zVal = (j / 30) * 4 - 2;
+                            points.push(new THREE.Vector3(ratio * 3, 0, zVal));
+                        }
+                        const lineGeom = new THREE.BufferGeometry().setFromPoints(points);
+                        const lineMesh = new THREE.Line(lineGeom, lineMaterial);
+                        linesGroup.add(lineMesh);
+                    }
+                    activeRBTGroup.add(linesGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            // Pulsing wave distortion
+                            const time = Date.now() * 0.003;
+                            linesGroup.children.forEach((l, idx) => {
+                                const positions = l.geometry.attributes.position.array;
+                                for (let step = 0; step < positions.length; step += 3) {
+                                    const zVal = positions[step + 2];
+                                    positions[step + 1] = Math.sin(zVal * 2 + time + idx * 0.3) * 0.25;
+                                }
+                                l.geometry.attributes.position.needsUpdate = true;
+                            });
+                        }
+                    };
+                    break;
+
+                case 'rupa':
+                    // Floating 2D Polygons (Flat flat geometries)
+                    const shapeGroup = new THREE.Group();
+                    const flatMat = new THREE.MeshStandardMaterial({ 
+                        color: 0xef4444, 
+                        side: THREE.DoubleSide, 
+                        roughness: 0.1,
+                        transparent: true,
+                        opacity: 0.85
+                    });
+                    
+                    // Hexagon flat shape
+                    const hexGeom = new THREE.RingGeometry(0.01, 1.3, 6);
+                    const hexMesh = new THREE.Mesh(hexGeom, flatMat);
+                    shapeGroup.add(hexMesh);
+
+                    // Outer flat line wireframe outline
+                    const hexWire = new THREE.Mesh(hexGeom, new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true }));
+                    hexWire.position.z = 0.02;
+                    shapeGroup.add(hexWire);
+
+                    activeRBTGroup.add(shapeGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            shapeGroup.rotation.z += 0.006;
+                        }
+                    };
+                    break;
+
+                case 'bentuk':
+                    // Complex 3D Polyhedrons with glossy/glass look
+                    const formsGroup = new THREE.Group();
+                    const formMat = new THREE.MeshPhysicalMaterial({
+                        color: 0x3b82f6,
+                        metalness: 0.1,
+                        roughness: 0.1,
+                        transparent: true,
+                        transmission: 0.6,
+                        thickness: 1.2
+                    });
+                    const corePoly = new THREE.Mesh(new THREE.IcosahedronGeometry(1.2, 1), formMat);
+                    const outerPolyWire = new THREE.Mesh(new THREE.IcosahedronGeometry(1.25, 1), new THREE.MeshBasicMaterial({ color: 0x00ccff, wireframe: true }));
+                    
+                    formsGroup.add(corePoly);
+                    formsGroup.add(outerPolyWire);
+                    activeRBTGroup.add(formsGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            formsGroup.rotation.y += 0.01;
+                            formsGroup.rotation.x -= 0.005;
+                        }
+                    };
+                    break;
+
+                case 'tekstur':
+                    // procedurally morphing bumpy Sphere (rough lwn licin)
+                    const textureGeom = new THREE.SphereGeometry(1.1, 64, 64);
+                    const textureMat = new THREE.MeshStandardMaterial({
+                        color: 0x10b981,
+                        roughness: 0.8,
+                        flatShading: true
+                    });
+                    const texturedSphere = new THREE.Mesh(textureGeom, textureMat);
+                    activeRBTGroup.add(texturedSphere);
+                    
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            const time = Date.now() * 0.002;
+                            const pos = textureGeom.attributes.position;
+                            const v = new THREE.Vector3();
+                            for (let i = 0; i < pos.count; i++) {
+                                v.fromBufferAttribute(pos, i);
+                                v.normalize();
+                                // Procedural displacement to make it bumpy/rough dynamically
+                                const noise = Math.sin(v.x * 6 + time) * Math.cos(v.y * 6 + time) * 0.12;
+                                v.multiplyScalar(1.1 + noise);
+                                pos.setXYZ(i, v.x, v.y, v.z);
+                            }
+                            pos.needsUpdate = true;
+                            texturedSphere.rotation.y += 0.005;
+                        }
+                    };
+                    break;
+
+                case 'saiz':
+                    // Two identical structures, one micro and one macro
+                    const sizeGroup = new THREE.Group();
+                    const sizeMat = new THREE.MeshStandardMaterial({ color: 0xeab308, metalness: 0.6 });
+                    
+                    const macroMesh = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.3, 1.3), sizeMat);
+                    macroMesh.position.set(-1.1, 0, 0);
+                    
+                    const microMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), sizeMat);
+                    microMesh.position.set(1.4, 0, 0);
+
+                    // Connecting scale caliper lines
+                    const barGeom = new THREE.CylinderGeometry(0.04, 0.04, 2.5);
+                    const barMesh = new THREE.Mesh(barGeom, new THREE.MeshBasicMaterial({ color: 0xffffff }));
+                    barMesh.rotation.z = Math.PI / 2;
+                    barMesh.position.set(0.1, 0, 0);
+
+                    sizeGroup.add(macroMesh);
+                    sizeGroup.add(microMesh);
+                    sizeGroup.add(barMesh);
+
+                    activeRBTGroup.add(sizeGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            macroMesh.rotation.y += 0.01;
+                            microMesh.rotation.y -= 0.02;
+                        }
+                    };
+                    break;
+
+                case 'warna':
+                    // Glowing spectrum wheel (Warm vs Cold colors)
+                    const colorWheelGroup = new THREE.Group();
+                    const segments = 16;
+                    const ringRadius = 1.3;
+
+                    for (let i = 0; i < segments; i++) {
+                        const angle = (i / segments) * Math.PI * 2;
+                        // Color spectrum interpolation
+                        const hue = i / segments;
+                        const col = new THREE.Color().setHSL(hue, 1, 0.5);
+
+                        const segmentGeom = new THREE.BoxGeometry(0.35, 0.35, 0.35);
+                        const segmentMat = new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 0.3 });
+                        const block = new THREE.Mesh(segmentGeom, segmentMat);
+                        
+                        block.position.set(Math.cos(angle) * ringRadius, Math.sin(angle) * ringRadius, 0);
+                        block.rotation.z = angle;
+                        colorWheelGroup.add(block);
+                    }
+                    activeRBTGroup.add(colorWheelGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            colorWheelGroup.rotation.z -= 0.008;
+                        }
+                    };
+                    break;
+
+                case 'ruang':
+                    // Hollow wireframe enclosing a solid core (Space inside/outside)
+                    const spaceGroup = new THREE.Group();
+                    
+                    // Large Outer Wireframe Container
+                    const outerBox = new THREE.Mesh(
+                        new THREE.BoxGeometry(2, 2, 2),
+                        new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true })
+                    );
+                    spaceGroup.add(outerBox);
+
+                    // Small Inner solid glowing core representing nested space
+                    const innerSolid = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.5, 16, 16),
+                        new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xf59e0b })
+                    );
+                    spaceGroup.add(innerSolid);
+
+                    activeRBTGroup.add(spaceGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            outerBox.rotation.y += 0.005;
+                            outerBox.rotation.x += 0.005;
+                            innerSolid.position.y = Math.sin(Date.now() * 0.002) * 0.3;
+                        }
+                    };
+                    break;
+
+                // ==================== 7 PRINSIP VISUALISATIONS ====================
+                case 'keseimbangan':
+                    // Balanced scale swaying beautifully
+                    const balanceGroup = new THREE.Group();
+                    const steelMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.1 });
+
+                    // Base Pillar
+                    const baseCone = new THREE.Mesh(new THREE.ConeGeometry(0.4, 1.8, 4), steelMat);
+                    baseCone.position.set(0, -1, 0);
+                    balanceGroup.add(baseCone);
+
+                    // Pivot Beam
+                    const beamGeom = new THREE.BoxGeometry(2.8, 0.08, 0.08);
+                    const beamMesh = new THREE.Mesh(beamGeom, steelMat);
+                    beamMesh.position.set(0, 0.3, 0);
+                    balanceGroup.add(beamMesh);
+
+                    // Balance weights
+                    const wt1 = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), new THREE.MeshStandardMaterial({ color: 0x06b6d4 }));
+                    wt1.position.set(-1.4, 0.15, 0);
+                    beamMesh.add(wt1);
+
+                    const wt2 = wt1.clone();
+                    wt2.position.set(1.4, 0.15, 0);
+                    beamMesh.add(wt2);
+
+                    balanceGroup.add(beamMesh);
+                    activeRBTGroup.add(balanceGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            // Perfect sway in equilibrium
+                            const sway = Math.sin(Date.now() * 0.002) * 0.15;
+                            beamMesh.rotation.z = sway;
+                        }
+                    };
+                    break;
+
+                case 'pengulangan':
+                    // repeating patterns aligned in grid with lighting sequence
+                    const repGroup = new THREE.Group();
+                    const ringsArray = [];
+                    const count = 5;
+
+                    for (let i = 0; i < count; i++) {
+                        const ringMesh = new THREE.Mesh(
+                            new THREE.TorusGeometry(0.35, 0.08, 8, 24),
+                            new THREE.MeshStandardMaterial({ color: 0x06b6d4, roughness: 0.2 })
+                        );
+                        ringMesh.position.set((i - (count - 1) / 2) * 0.85, 0, 0);
+                        repGroup.add(ringMesh);
+                        ringsArray.push(ringMesh);
+                    }
+                    activeRBTGroup.add(repGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            const time = Date.now();
+                            ringsArray.forEach((r, idx) => {
+                                r.rotation.y += 0.01;
+                                // Glowing sequencer pattern pulse
+                                const glowFactor = Math.max(0.2, Math.sin((time * 0.004) - (idx * 0.8)));
+                                r.material.emissive.setHex(0x06b6d4);
+                                r.material.emissiveIntensity = glowFactor;
+                            });
+                        }
+                    };
+                    break;
+
+                case 'kontras':
+                    // Extreme opposite geometries side-by-side
+                    const contrastGroup = new THREE.Group();
+                    
+                    // Dark, rough box (Element 1)
+                    const roughCube = new THREE.Mesh(
+                        new THREE.BoxGeometry(1.2, 1.2, 1.2),
+                        new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.9, flatShading: true })
+                    );
+                    roughCube.position.set(-0.9, 0, 0);
+                    contrastGroup.add(roughCube);
+
+                    // Shiny, smooth white sphere (Element 2)
+                    const shinySphere = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.6, 32, 32),
+                        new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.0, metalness: 0.1, emissive: 0xffffff, emissiveIntensity: 0.4 })
+                    );
+                    shinySphere.position.set(0.9, 0, 0);
+                    contrastGroup.add(shinySphere);
+
+                    activeRBTGroup.add(contrastGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            roughCube.rotation.x += 0.005;
+                            roughCube.rotation.y += 0.005;
+                            shinySphere.position.y = Math.sin(Date.now() * 0.003) * 0.15;
+                        }
+                    };
+                    break;
+
+                case 'kepelbagaian':
+                    // Array of varying primitive shapes
+                    const varGroup = new THREE.Group();
+                    const geom1 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
+                    geom1.position.set(-1.2, 0.6, 0);
+
+                    const geom2 = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), new THREE.MeshStandardMaterial({ color: 0x10b981 }));
+                    geom2.position.set(1.2, -0.6, 0);
+
+                    const geom3 = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.1, 8, 24), new THREE.MeshStandardMaterial({ color: 0x3b82f6 }));
+                    geom3.position.set(-0.8, -0.6, 0);
+
+                    const geom4 = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.7, 8), new THREE.MeshStandardMaterial({ color: 0xeab308 }));
+                    geom4.position.set(0.8, 0.6, 0);
+
+                    varGroup.add(geom1); varGroup.add(geom2); varGroup.add(geom3); varGroup.add(geom4);
+                    activeRBTGroup.add(varGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            geom1.rotation.y += 0.01;
+                            geom2.rotation.x -= 0.015;
+                            geom3.rotation.z += 0.02;
+                            geom4.rotation.y -= 0.01;
+                        }
+                    };
+                    break;
+
+                case 'kesatuan':
+                    // unified crystal structures interlocking perfectly
+                    const unityGroup = new THREE.Group();
+                    const centerCore = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.6, 16, 16),
+                        new THREE.MeshStandardMaterial({ color: 0x06b6d4, roughness: 0.1 })
+                    );
+                    unityGroup.add(centerCore);
+
+                    // Surrounding connected orbital spikes/crystals
+                    const crystalsNum = 8;
+                    for (let i = 0; i < crystalsNum; i++) {
+                        const angle = (i / crystalsNum) * Math.PI * 2;
+                        const spike = new THREE.Mesh(
+                            new THREE.ConeGeometry(0.18, 0.8, 4),
+                            new THREE.MeshStandardMaterial({ color: 0x0891b2, roughness: 0.2 })
+                        );
+                        spike.position.set(Math.cos(angle) * 0.9, Math.sin(angle) * 0.9, 0);
+                        spike.rotation.z = angle - Math.PI / 2;
+                        unityGroup.add(spike);
+                    }
+
+                    activeRBTGroup.add(unityGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            unityGroup.rotation.y += 0.005;
+                            unityGroup.rotation.z += 0.002;
+                        }
+                    };
+                    break;
+
+                case 'keringkasan':
+                    // Slick ultra-minimalist glowing circle/ring representing Simplicity
+                    const simpleGroup = new THREE.Group();
+                    const minimalRing = new THREE.Mesh(
+                        new THREE.TorusGeometry(1.4, 0.03, 8, 100),
+                        new THREE.MeshBasicMaterial({ color: 0xffffff })
+                    );
+                    simpleGroup.add(minimalRing);
+
+                    // Single tiny core in the absolute center
+                    const minCore = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.15, 16, 16),
+                        new THREE.MeshBasicMaterial({ color: primaryColor })
+                    );
+                    simpleGroup.add(minCore);
+
+                    activeRBTGroup.add(simpleGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            minimalRing.rotation.y += 0.02;
+                        }
+                    };
+                    break;
+
+                case 'harmoni':
+                    // Nested concentric rings rotating gracefully together
+                    const harmGroup = new THREE.Group();
+                    const harmMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, metalness: 0.8 });
+                    
+                    const ring1 = new THREE.Mesh(new THREE.TorusGeometry(1.4, 0.06, 8, 80), harmMat);
+                    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.0, 0.06, 8, 80), harmMat);
+                    const ring3 = new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.06, 8, 80), harmMat);
+
+                    harmGroup.add(ring1);
+                    harmGroup.add(ring2);
+                    harmGroup.add(ring3);
+
+                    activeRBTGroup.add(harmGroup);
+                    activeRBTGroup.userData = {
+                        animate: () => {
+                            ring1.rotation.y += 0.005;
+                            ring2.rotation.x -= 0.008;
+                            ring3.rotation.y += 0.012;
+                        }
+                    };
+                    break;
+            }
+
+            mainContainer3D.add(activeRBTGroup);
+            mainContainer3D.rotation.set(0.3, 0.5, 0); // Reset base view nicely
+            showToast(`Membuka simulasi 3D: ${data.title}`, "info");
+        }
+
+        // Export Logic
+        function showExportModal() {
+            const modal = document.getElementById('export-modal');
+            const codeBox = document.getElementById('export-code-box');
+            if (codeBox) codeBox.value = generatePristineHTML();
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeExportModal() {
+            const modal = document.getElementById('export-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function copyGeneratedCode() {
+            const codeBox = document.getElementById('export-code-box');
+            if (codeBox) {
+                codeBox.select();
+                document.execCommand('copy');
+                showToast("Kod RBT disalin! Boleh digunakan di mana-mana platform.", "success");
+                closeExportModal();
+            }
+        }
+
+        // Synthesize dynamic workspace elements to produce static build HTML
+        function generatePristineHTML() {
+            const contentWrapper = document.getElementById('web-layout-wrapper').cloneNode(true);
+            
+            contentWrapper.querySelectorAll('.control-overlay').forEach(el => el.remove());
+            contentWrapper.querySelectorAll('.editor-indicator').forEach(el => el.remove());
+            contentWrapper.querySelectorAll('[contenteditable]').forEach(el => {
+                el.setAttribute('contenteditable', 'false');
+            });
+
+            const templateHTML = `<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunia Reka Bentuk RBT Tingkatan 1 - BoBoiBoy</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #060814;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 85, 0, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 204, 255, 0.1) 0px, transparent 50%);
+            color: #f3f4f6;
+            padding: 2.5rem 1rem;
+        }
+        .font-cyber { font-family: 'Orbitron', sans-serif; }
+    </style>
+</head>
+<body>
+    <div class="max-w-4xl mx-auto space-y-8">
+        ${contentWrapper.innerHTML}
+    </div>
+    <footer class="text-center py-12 text-xs text-slate-500 font-cyber">
+        Diterbitkan oleh BoBoiBoy RBT Academy Tech-Lab • 2026
+    </footer>
+</body>
+</html>`;
+            return templateHTML;
+        }
+
+        // Dynamic High-Tech system toasts
+        function showToast(message, type = "success") {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            
+            let bg = "bg-slate-950 border-orange-500/40 text-orange-400";
+            let icon = "fa-triangle-exclamation";
+            
+            if (type === "success") {
+                bg = "bg-[#090d1a] border-emerald-500/40 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]";
+                icon = "fa-shield-halved";
+            } else if (type === "warning") {
+                bg = "bg-[#090d1a] border-yellow-500/40 text-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.3)]";
+                icon = "fa-circle-radiation";
+            } else if (type === "info") {
+                bg = "bg-[#090d1a] border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]";
+                icon = "fa-compass-drafting";
+            }
+            
+            toast.className = `${bg} border px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 text-xs font-semibold transform translate-y-2 opacity-0 transition-all duration-300 max-w-sm font-cyber`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icon} text-sm"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
